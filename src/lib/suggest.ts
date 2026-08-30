@@ -44,16 +44,30 @@ function pick(
   /** Optional layers are only added when the user tagged them for the occasion. */
   requireOccasion = false,
 ): ClothingItem | undefined {
-  const candidates = items
+  const scored = items
     .filter(
       (item) =>
         item.category === category &&
         (!requireOccasion || item.occasions.includes(occasion)),
     )
-    .sort((a, b) => scoreItem(b, occasion) - scoreItem(a, occasion));
-  if (candidates.length === 0) return undefined;
-  // Rotate through the top of the list so repeat taps don't return one answer.
-  return candidates[seed % Math.min(candidates.length, 3)];
+    .map((item) => ({ item, score: scoreItem(item, occasion) }))
+    .sort((a, b) => b.score - a.score);
+  if (scored.length === 0) return undefined;
+  /*
+   * Rotate through everything scoring near the top so repeat taps keep giving
+   * a different answer.
+   *
+   * This was a hard `seed % min(length, 3)` window, which meant a deep closet
+   * still only ever produced three outfits and cycled back to the first on the
+   * fourth tap — the "it keeps showing the same outfit" complaint. Banding by
+   * score instead lets variety grow with the closet while still refusing to
+   * reach for pieces the ranker rates poorly: a piece tagged for the occasion
+   * outscores an untagged one by 100, so a 25-point band never crosses that
+   * line. The cap keeps the rotation short enough to feel deliberate.
+   */
+  const cutoff = scored[0].score - 25;
+  const near = scored.filter((entry) => entry.score >= cutoff);
+  return near[seed % Math.min(near.length, 8)].item;
 }
 
 export function suggestOutfit(

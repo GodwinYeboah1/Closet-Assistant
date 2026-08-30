@@ -1,6 +1,6 @@
 "use client";
 
-import type { ClothingItem, NewClothingItem, Outfit } from "./types";
+import { TIME_SLOTS, type ClothingItem, type NewClothingItem, type Outfit } from "./types";
 
 /**
  * Placeholder persistence layer.
@@ -21,6 +21,7 @@ const CHANGE_EVENT = "closet-assistant:change";
 
 /** Cached so `useSyncExternalStore` gets a referentially stable snapshot. */
 let itemsCache: ClothingItem[] | null = null;
+let outfitsCache: Outfit[] | null = null;
 
 function read<T>(key: string): T[] {
   if (typeof window === "undefined") return [];
@@ -35,6 +36,7 @@ function read<T>(key: string): T[] {
 function write<T>(key: string, value: T[]) {
   window.localStorage.setItem(key, JSON.stringify(value));
   itemsCache = null;
+  outfitsCache = null;
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
@@ -102,8 +104,36 @@ export function markWorn(itemId: string, when = new Date()): void {
   });
 }
 
+/** The moment an outfit stands for, falling back to when it was recorded. */
+function outfitTime(outfit: Outfit): string {
+  return outfit.wornAt ?? outfit.createdAt;
+}
+
+/**
+ * Worn/planned outfits: newest day first, then chronological within the day.
+ *
+ * A day reads forwards — an all-day entry, then morning through night — because
+ * that's the order the day happened in, and a day is the unit people scan. Days
+ * themselves read backwards, newest first, because that's the unit people
+ * arrive looking for. Entries with no slot sort ahead of slotted ones: they
+ * stand for the whole day rather than a part of it.
+ *
+ * Cached for the same reason `getItems` is: `useSyncExternalStore` compares
+ * snapshots by reference, so returning a fresh array each call would spin.
+ */
 export function getOutfits(): Outfit[] {
-  return read<Outfit>(OUTFITS_KEY);
+  if (!outfitsCache) {
+    outfitsCache = read<Outfit>(OUTFITS_KEY).sort((a, b) => {
+      const dayA = outfitTime(a).slice(0, 10);
+      const dayB = outfitTime(b).slice(0, 10);
+      if (dayA !== dayB) return dayB.localeCompare(dayA);
+      const slotA = a.slot ? TIME_SLOTS.indexOf(a.slot) : -1;
+      const slotB = b.slot ? TIME_SLOTS.indexOf(b.slot) : -1;
+      if (slotA !== slotB) return slotA - slotB;
+      return outfitTime(a).localeCompare(outfitTime(b));
+    });
+  }
+  return outfitsCache;
 }
 
 export function saveOutfit(
@@ -170,6 +200,7 @@ export function subscribe(listener: () => void): () => void {
   // here rather than in `write`.
   const onChange = () => {
     itemsCache = null;
+    outfitsCache = null;
     listener();
   };
   window.addEventListener(CHANGE_EVENT, onChange);

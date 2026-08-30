@@ -83,6 +83,41 @@ export const OCCASION_LABELS: Record<Occasion, string> = {
   active: "Active",
 };
 
+/**
+ * Optional time-of-day slot for a logged outfit.
+ *
+ * Absent is the ordinary case and means "what I wore that day" — logging a
+ * single outfit must never require picking a slot. Slots exist for the days you
+ * actually changed: a work fit at 9am and a different one that night. Because
+ * the field is optional, every outfit logged before slots existed stays valid
+ * and reads as an all-day entry.
+ */
+export const TIME_SLOTS = ["morning", "midday", "evening", "night"] as const;
+
+export type TimeSlot = (typeof TIME_SLOTS)[number];
+
+export const TIME_SLOT_LABELS: Record<TimeSlot, string> = {
+  morning: "Morning",
+  midday: "Midday",
+  evening: "Evening",
+  night: "Night",
+};
+
+/** What an entry with no slot is called wherever a label is needed. */
+export const ALL_DAY_LABEL = "All day";
+
+/**
+ * The slot a given moment falls in. Used only to preselect a sensible default
+ * when logging a second outfit for the same day — never to overwrite a choice.
+ */
+export function slotForDate(date = new Date()): TimeSlot {
+  const hour = date.getHours();
+  if (hour < 11) return "morning";
+  if (hour < 17) return "midday";
+  if (hour < 21) return "evening";
+  return "night";
+}
+
 export type ClothingItem = {
   id: string;
   /**
@@ -111,6 +146,12 @@ export type Outfit = {
   /** Item ids, in layering order (bottom to top). */
   itemIds: string[];
   occasion: Occasion;
+  /**
+   * Which part of the day this was worn for. Optional on purpose: `undefined`
+   * means the entry stands for the whole day, which is what every outfit logged
+   * before this field existed means too.
+   */
+  slot?: TimeSlot;
   note?: string;
   /** ISO date the outfit is planned for or was worn. */
   wornAt: string | null;

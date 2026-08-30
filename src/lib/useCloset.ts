@@ -1,11 +1,12 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { getItem, getItems, subscribe } from "./store";
-import type { ClothingItem } from "./types";
+import { getItem, getItems, getOutfits, subscribe } from "./store";
+import type { ClothingItem, Outfit } from "./types";
 
-/** Stable empty snapshot for server render and hydration. */
+/** Stable empty snapshots for server render and hydration. */
 const EMPTY: ClothingItem[] = [];
+const EMPTY_OUTFITS: Outfit[] = [];
 const noopSubscribe = () => () => {};
 
 /** True only after hydration, so an empty catalog doesn't flash on first paint. */
@@ -33,4 +34,10 @@ export function useItem(itemId: string): ClothingItem | null | undefined {
   );
   if (!ready) return undefined;
   return item ?? null;
+}
+
+/** Every outfit logged or planned, newest first. */
+export function useOutfits() {
+  const outfits = useSyncExternalStore(subscribe, getOutfits, () => EMPTY_OUTFITS);
+  return { outfits, ready: useHydrated() };
 }
