@@ -2,21 +2,25 @@
 
 import { clearSamples } from "@/lib/store";
 
-/** Shown while any seeded item is still in the closet. One tap removes them all. */
+/**
+ * One line, not a card.
+ *
+ * This was a bordered panel with four lines of copy and its own button — 138px
+ * of a phone screen to say something the reader needs once. It is a note, so it
+ * reads as a note.
+ */
 export default function SampleBanner({ count }: { count: number }) {
   return (
-    <div className="mx-5 mb-4 flex flex-col items-start gap-2 rounded-xl border border-line bg-surface px-4 py-3 sm:flex-row sm:items-center sm:gap-3">
-      <p className="flex-1 text-sm text-muted">
-        <span className="font-medium text-ink">{count} example item{count === 1 ? "" : "s"}</span>{" "}
-        so suggestions have something to work with. Yours will sit alongside them.
-      </p>
+    <p className="px-5 pb-4 text-sm text-muted">
+      {count} of these are examples.{" "}
       <button
         type="button"
         onClick={clearSamples}
-        className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line px-4 text-xs transition-transform active:scale-95"
+        /* -my-3/py-3 keeps the 44px hit area without moving the text in the line. */
+        className="-my-3 py-3 text-ink underline underline-offset-4 transition-opacity hover:opacity-70"
       >
-        Clear examples
+        Clear them
       </button>
-    </div>
+    </p>
   );
 }

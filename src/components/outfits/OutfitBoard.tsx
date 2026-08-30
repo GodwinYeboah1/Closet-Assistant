@@ -55,7 +55,7 @@ export default function OutfitBoard() {
             aria-pressed={occasion === value}
             className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm transition-colors ${
               occasion === value
-                ? "border-accent bg-accent-soft text-accent font-medium"
+                ? "border-accent bg-accent font-medium text-on-accent"
                 : "border-line bg-surface text-muted hover:text-ink"
             }`}
           >

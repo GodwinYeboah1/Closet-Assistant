@@ -38,14 +38,7 @@ export default function ClosetView() {
 
   return (
     <main className="mx-auto max-w-2xl">
-      <PageHeader
-        title="Closet"
-        subtitle={
-          items.length
-            ? `${items.length} item${items.length === 1 ? "" : "s"} catalogued`
-            : undefined
-        }
-      />
+      <PageHeader title="Closet" />
 
       {items.length === 0 ? (
         <EmptyState
@@ -58,6 +51,7 @@ export default function ClosetView() {
           {sampleCount > 0 ? <SampleBanner count={sampleCount} /> : null}
           <FilterBar
             items={items}
+            visibleCount={visible.length}
             category={category}
             color={color}
             sort={sort}

@@ -221,7 +221,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
                 deleteItem(item.id);
                 router.push("/closet");
               }}
-              className="inline-flex min-h-11 items-center rounded-full bg-accent px-4 text-sm font-medium text-white"
+              className="inline-flex min-h-11 items-center rounded-full bg-accent px-4 text-sm font-medium text-on-accent"
             >
               Delete
             </button>
@@ -283,7 +283,7 @@ function Toggle({
       onClick={onClick}
       aria-pressed={active}
       className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors ${
-        active ? "border-accent bg-accent-soft text-accent font-medium" : "border-line bg-surface text-muted"
+        active ? "border-accent bg-accent font-medium text-on-accent" : "border-line bg-surface text-muted"
       }`}
     >
       {children}

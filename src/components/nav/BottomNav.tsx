@@ -27,7 +27,7 @@ export default function BottomNav() {
               href={link.href}
               aria-current={active ? "page" : undefined}
               className={`inline-flex min-h-11 items-center rounded-full px-3.5 text-sm transition-colors sm:px-4 ${
-                active ? "bg-accent-soft text-accent font-medium" : "text-muted hover:text-ink"
+                active ? "bg-accent font-medium text-on-accent" : "text-muted hover:text-ink"
               }`}
             >
               {link.label}
