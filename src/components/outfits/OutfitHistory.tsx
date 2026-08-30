@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import {
   ALL_DAY_LABEL,
   OCCASION_LABELS,
@@ -15,6 +14,7 @@ import { useCloset, useOutfits } from "@/lib/useCloset";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import OutfitCard from "./OutfitCard";
+import OutfitTabs from "./OutfitTabs";
 
 /**
  * The log of what was actually worn.
@@ -133,15 +133,8 @@ export default function OutfitHistory() {
               `${dayCount} day${dayCount === 1 ? "" : "s"}.`
             : undefined
         }
-        action={
-          <Link
-            href="/outfits"
-            className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline"
-          >
-            Log an outfit
-          </Link>
-        }
       />
+      <OutfitTabs />
 
       {entries.length === 0 ? (
         <EmptyState

@@ -15,6 +15,7 @@ import { useCloset } from "@/lib/useCloset";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import OutfitCard from "./OutfitCard";
+import OutfitTabs from "./OutfitTabs";
 import WearControls from "./WearControls";
 
 export default function OutfitBoard() {
@@ -41,17 +42,8 @@ export default function OutfitBoard() {
   if (items.length === 0) {
     return (
       <main className="mx-auto max-w-2xl">
-        <PageHeader
-          title="Outfits"
-          action={
-            <Link
-              href="/outfits/history"
-              className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline"
-            >
-              Worn
-            </Link>
-          }
-        />
+        <PageHeader title="Outfits" />
+        <OutfitTabs />
         <EmptyState
           title="Suggestions need a closet first"
           body="Everything suggested here comes from clothes you've photographed — nothing is invented and nothing is for sale. Add a few items to get started."
@@ -66,15 +58,8 @@ export default function OutfitBoard() {
       <PageHeader
         title="Outfits"
         subtitle="Combinations built only from what you own."
-        action={
-          <Link
-            href="/outfits/history"
-            className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline"
-          >
-            Worn
-          </Link>
-        }
       />
+      <OutfitTabs />
 
       <div className="flex flex-wrap gap-2 px-5 pb-6">
         {OCCASIONS.map((value) => (

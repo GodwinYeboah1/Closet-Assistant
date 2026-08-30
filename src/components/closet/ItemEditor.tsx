@@ -17,6 +17,8 @@ import {
   type Occasion,
 } from "@/lib/types";
 import { useItem } from "@/lib/useCloset";
+import BackLink from "@/components/ui/BackLink";
+import PageHeader from "@/components/ui/PageHeader";
 import PhotoPending from "./PhotoPending";
 
 /** Everything about an item is editable after the fact, photo included. */
@@ -30,11 +32,20 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
   if (item === undefined) return null;
   if (item === null) {
     return (
-      <main className="mx-auto max-w-2xl px-5 py-20 text-center">
-        <p className="text-sm text-muted">That item is no longer in your closet.</p>
-        <Link href="/closet" className="mt-4 inline-block text-sm underline underline-offset-4">
-          Back to closet
-        </Link>
+      <main className="mx-auto max-w-2xl px-5 py-20">
+        <div className="rounded-2xl border border-dashed border-line bg-surface px-6 py-12 text-center">
+          <h1 className="text-base font-medium">That item is no longer in your closet</h1>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
+            It may have been deleted from another tab. Outfits you logged with it
+            are still in your worn history.
+          </p>
+          <Link
+            href="/closet"
+            className="mt-6 inline-flex min-h-11 items-center rounded-full bg-ink px-5 text-sm font-medium text-canvas transition-transform active:scale-95"
+          >
+            Go to closet
+          </Link>
+        </div>
       </main>
     );
   }
@@ -68,12 +79,19 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
   };
 
   return (
-    <main className="mx-auto max-w-2xl px-5 pb-10 pt-6">
-      <Link href="/closet" className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline">
-        ← Closet
-      </Link>
+    <main className="mx-auto max-w-2xl pb-10">
+      {/* The item screen was the only one with no heading at all — its name
+          lived in a form field and nothing announced the page. It now carries
+          the same header as every other screen, and the title tracks the name
+          field as you type. */}
+      <PageHeader
+        title={item.name?.trim() || CATEGORY_LABELS[item.category]}
+        subtitle={`${lastWornLabel(item.lastWornAt)} · worn ${item.wearCount}\u00d7`}
+        back={<BackLink />}
+      />
 
-      <div className="photo-tile mt-4 aspect-square rounded-2xl">
+      <div className="px-5">
+      <div className="photo-tile aspect-square rounded-2xl">
         {item.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -89,9 +107,6 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <p className="font-mono text-xs text-muted">
-          {lastWornLabel(item.lastWornAt)} · worn {item.wearCount}×
-        </p>
         <div className="ml-auto flex flex-wrap gap-2">
           <Link
             href={`/capture?itemId=${item.id}`}
@@ -242,6 +257,8 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
             Delete item
           </button>
         )}
+      </div>
+
       </div>
 
       <input
