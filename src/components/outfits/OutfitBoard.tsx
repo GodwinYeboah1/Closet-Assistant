@@ -43,7 +43,7 @@ export default function OutfitBoard() {
         subtitle="Combinations built only from what you own."
       />
 
-      <div className="flex gap-2 overflow-x-auto px-5 pb-5">
+      <div className="flex flex-wrap gap-2 px-5 pb-6">
         {OCCASIONS.map((value) => (
           <button
             key={value}
@@ -64,18 +64,18 @@ export default function OutfitBoard() {
         ))}
       </div>
 
-      <section className="mx-5 rounded-2xl border border-line bg-surface p-4">
+      <section className="mx-5 rounded-2xl border border-line bg-surface p-5">
         {suggestion.items.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted">
+          <p className="py-8 text-center text-sm text-muted">
             Nothing in the closet fits this yet.
           </p>
         ) : (
           <>
             <OutfitCard key={`${occasion}-${seed}`} items={suggestion.items} />
-            <p className="mt-3 text-sm text-muted">{suggestion.rationale}</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted">{suggestion.rationale}</p>
 
             {suggestion.missing.length > 0 ? (
-              <p className="mt-2 text-sm text-muted">
+              <p className="mt-2 text-sm leading-relaxed text-muted">
                 No {suggestion.missing.map((c) => CATEGORY_LABELS[c].toLowerCase()).join(" or ")} catalogued yet —{" "}
                 <Link href="/capture" className="underline underline-offset-4">
                   add some
@@ -84,7 +84,7 @@ export default function OutfitBoard() {
               </p>
             ) : null}
 
-            <div className="mt-4 flex gap-2">
+            <div className="mt-6 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -116,7 +116,7 @@ export default function OutfitBoard() {
         )}
       </section>
 
-      <p className="px-5 pt-4 text-xs text-muted">
+      <p className="px-5 pt-6 text-xs leading-relaxed text-muted">
         Tag items with the occasions they suit — on the item screen — and suggestions get
         noticeably better.
       </p>

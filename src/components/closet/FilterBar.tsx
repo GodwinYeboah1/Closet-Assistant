@@ -39,7 +39,8 @@ export default function FilterBar({
 
   return (
     <div className="space-y-3 px-5 pb-4">
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      {/* Wraps: five categories in a scroller hid "Accessory" behind the edge. */}
+      <div className="flex flex-wrap gap-2">
         <Chip active={category === null} onClick={() => onCategory(null)}>
           All
         </Chip>
@@ -54,39 +55,42 @@ export default function FilterBar({
         ))}
       </div>
 
-      <div className="flex items-center gap-3 overflow-x-auto pb-1">
-        <div className="flex shrink-0 gap-0.5">
-          {colors.map((value) => (
-            <button
-              key={value}
-              type="button"
-              aria-label={value}
-              aria-pressed={color === value}
-              onClick={() => onColor(color === value ? null : value)}
-              className="grid h-11 w-11 shrink-0 place-items-center transition-transform active:scale-90"
-            >
-              {/* 44px hit area, 26px dot — the target has to be thumb-sized. */}
-              <span
-                className={`h-[26px] w-[26px] rounded-full border ${
-                  color === value ? "border-accent ring-2 ring-accent/50" : "border-line"
-                }`}
-                style={{ backgroundColor: COLOR_SWATCHES[value] }}
-              />
-            </button>
-          ))}
-        </div>
+      {/*
+        Colours and sorts are separate controls and get separate rows. Sharing
+        one scroll box pushed "Least worn" off the right edge, so a sort option
+        was unreachable without knowing to swipe a row of colour dots.
+      */}
+      <div className="-mx-1 flex gap-0.5 overflow-x-auto px-1 pb-1">
+        {colors.map((value) => (
+          <button
+            key={value}
+            type="button"
+            aria-label={value}
+            aria-pressed={color === value}
+            onClick={() => onColor(color === value ? null : value)}
+            className="grid h-11 w-11 shrink-0 place-items-center transition-transform active:scale-90"
+          >
+            {/* 44px hit area, 26px dot — the target has to be thumb-sized. */}
+            <span
+              className={`h-[26px] w-[26px] rounded-full border ${
+                color === value ? "border-accent ring-2 ring-accent/50" : "border-line"
+              }`}
+              style={{ backgroundColor: COLOR_SWATCHES[value] }}
+            />
+          </button>
+        ))}
+      </div>
 
-        <div className="ml-auto flex shrink-0 gap-2">
-          {SORTS.map((option) => (
-            <Chip
-              key={option.key}
-              active={sort === option.key}
-              onClick={() => onSort(option.key)}
-            >
-              {option.label}
-            </Chip>
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-2">
+        {SORTS.map((option) => (
+          <Chip
+            key={option.key}
+            active={sort === option.key}
+            onClick={() => onSort(option.key)}
+          >
+            {option.label}
+          </Chip>
+        ))}
       </div>
     </div>
   );
