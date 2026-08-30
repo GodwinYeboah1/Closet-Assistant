@@ -22,6 +22,25 @@ export type ProcessedCapture = {
 
 const MAX_EDGE = 1024;
 const OUTPUT_SIZE = 900;
+
+/**
+ * Tiles are encoded as WebP, not PNG.
+ *
+ * These are photographs. A lossless 900x900 PNG of one runs roughly 0.8-2MB
+ * once it is a base64 data URL, and localStorage stops at about 5MB — so a
+ * catalogue used to hit the ceiling and throw after three or four items. WebP
+ * keeps the alpha channel that the background removal produces, which JPEG
+ * cannot, at around a tenth of the bytes.
+ */
+const OUTPUT_TYPE = "image/webp";
+const OUTPUT_QUALITY = 0.82;
+
+/** Encodes to WebP, falling back to PNG where a browser refuses the type. */
+function encode(canvas: HTMLCanvasElement): string {
+  const url = canvas.toDataURL(OUTPUT_TYPE, OUTPUT_QUALITY);
+  // A canvas that doesn't know the type silently hands back a PNG instead.
+  return url.startsWith(`data:${OUTPUT_TYPE}`) ? url : canvas.toDataURL("image/png");
+}
 /** Squared RGB distance under which a pixel counts as "the same" as the border. */
 const TOLERANCE = 42 * 42 * 3;
 const PADDING = 0.06;
@@ -147,7 +166,7 @@ function centreCrop(canvas: HTMLCanvasElement): string {
       OUTPUT_SIZE,
       OUTPUT_SIZE,
     );
-  return out.toDataURL("image/png");
+  return encode(out);
 }
 
 export function processCapture(source: Source): ProcessedCapture {
@@ -182,7 +201,7 @@ export function processCapture(source: Source): ProcessedCapture {
     .getContext("2d")
     ?.drawImage(canvas, box.x, box.y, box.size, box.size, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
-  return { dataUrl: out.toDataURL("image/png"), backgroundRemoved: true, cropped: true };
+  return { dataUrl: encode(out), backgroundRemoved: true, cropped: true };
 }
 
 /** Rough dominant-colour read used to pre-select the colour chip after capture. */

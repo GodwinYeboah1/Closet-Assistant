@@ -67,9 +67,10 @@ export default function OutfitHistory() {
 
   const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
 
-  // An outfit outlives an edit but not a deletion: `deleteItem` drops any
-  // outfit containing the removed piece, so a missing id here means the store
-  // changed under us. Skip the piece rather than render a hole.
+  // Deleting a garment no longer deletes the outfits it appeared in, so an id
+  // that resolves to nothing is expected: the entry keeps the pieces it still
+  // has and says how many are gone. An entry with nothing left to show is
+  // dropped, since a card of no garments is noise rather than a record.
   const entries = useMemo(
     () =>
       outfits
@@ -79,6 +80,9 @@ export default function OutfitHistory() {
           pieces: outfit.itemIds
             .map((id) => byId.get(id))
             .filter((piece) => piece !== undefined),
+          missing:
+            outfit.itemIds.length -
+            outfit.itemIds.filter((id) => byId.has(id)).length,
         }))
         .filter((entry) => entry.pieces.length > 0),
     [outfits, byId],
@@ -179,7 +183,7 @@ export default function OutfitHistory() {
                 </div>
 
                 <ol className="space-y-3">
-                  {group.map(({ outfit, pieces, tags }) => (
+                  {group.map(({ outfit, pieces, tags, missing }) => (
                     <li
                       key={outfit.id}
                       className="rounded-2xl border border-line bg-surface p-4"
@@ -199,6 +203,12 @@ export default function OutfitHistory() {
                         </span>
                       </div>
                       <OutfitCard items={pieces} />
+                      {missing > 0 ? (
+                        <p className="mt-3 text-sm text-muted">
+                          {missing} piece{missing === 1 ? "" : "s"} no longer in your
+                          closet.
+                        </p>
+                      ) : null}
                       {outfit.note ? (
                         <p className="mt-3 text-sm text-muted">{outfit.note}</p>
                       ) : null}

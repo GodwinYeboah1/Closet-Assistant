@@ -19,6 +19,30 @@ const SEEDED_KEY = "closet-assistant:seeded:v1";
 const SEED_VERSION_KEY = "closet-assistant:seed-version";
 const CHANGE_EVENT = "closet-assistant:change";
 
+/**
+ * Thrown when a write can't fit in localStorage.
+ *
+ * The ceiling is around 5MB and photographs are the only thing here big enough
+ * to reach it, so this is really "the camera filled the disk". Callers that can
+ * add a photo are expected to catch it and say so; everything else is welcome
+ * to let it reach the error boundary, which is still better than the silent
+ * `QuotaExceededError` that used to blank the screen.
+ */
+export class StorageFullError extends Error {
+  constructor() {
+    super("No room left in this device's local storage.");
+    this.name = "StorageFullError";
+  }
+}
+
+function isQuotaError(error: unknown): boolean {
+  return (
+    error instanceof DOMException &&
+    (error.name === "QuotaExceededError" ||
+      error.name === "NS_ERROR_DOM_QUOTA_REACHED")
+  );
+}
+
 /** Cached so `useSyncExternalStore` gets a referentially stable snapshot. */
 let itemsCache: ClothingItem[] | null = null;
 let outfitsCache: Outfit[] | null = null;
@@ -34,7 +58,14 @@ function read<T>(key: string): T[] {
 }
 
 function write<T>(key: string, value: T[]) {
-  window.localStorage.setItem(key, JSON.stringify(value));
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    // Nothing was written, so the caches still match what's on disk: leave them
+    // alone and let the caller decide what to tell the user.
+    if (isQuotaError(error)) throw new StorageFullError();
+    throw error;
+  }
   itemsCache = null;
   outfitsCache = null;
   window.dispatchEvent(new Event(CHANGE_EVENT));
@@ -83,14 +114,19 @@ export function updateItem(
   );
 }
 
+/**
+ * Removes a garment. Outfit history is deliberately left alone.
+ *
+ * This used to delete every outfit the garment appeared in, which meant getting
+ * rid of one shirt could erase most of the log — measured at three entries down
+ * to one from a single deletion. What you wore on a day is a fact about that
+ * day, and owning the garment later is not part of it. The history view renders
+ * whichever pieces survive and says how many are gone.
+ */
 export function deleteItem(itemId: string): void {
   write(
     ITEMS_KEY,
     read<ClothingItem>(ITEMS_KEY).filter((item) => item.id !== itemId),
-  );
-  write(
-    OUTFITS_KEY,
-    read<Outfit>(OUTFITS_KEY).filter((fit) => !fit.itemIds.includes(itemId)),
   );
 }
 

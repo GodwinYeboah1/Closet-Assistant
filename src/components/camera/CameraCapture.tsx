@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { nearestColorName } from "@/lib/color";
 import { dominantColor, processCapture, type ProcessedCapture } from "@/lib/image";
-import { addItem, updateItem } from "@/lib/store";
+import { StorageFullError, addItem, updateItem } from "@/lib/store";
 import type { Category } from "@/lib/types";
 import { useItem } from "@/lib/useCloset";
 import CategoryStrip from "./CategoryStrip";
@@ -31,6 +31,8 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
   const [savedCategory, setSavedCategory] = useState<Category | null>(null);
   const [flash, setFlash] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  /** Shown inside the review panel, where the unsaved shot still is. */
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [addedCount, setAddedCount] = useState(0);
 
   const stopStream = useCallback(() => {
@@ -89,6 +91,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
   }, []);
 
   const retake = useCallback(() => {
+    setSaveError(null);
     setShot(null);
     setPhase(streamRef.current ? "live" : "blocked");
   }, []);
@@ -97,13 +100,25 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
     async (category: Category) => {
       if (!shot) return;
       const rgb = await dominantColor(shot.dataUrl);
-      addItem({
-        photoUrl: shot.dataUrl,
-        category,
-        color: rgb ? nearestColorName(rgb) : "multi",
-        tags: [],
-        occasions: ["everyday"],
-      });
+      try {
+        addItem({
+          photoUrl: shot.dataUrl,
+          category,
+          color: rgb ? nearestColorName(rgb) : "multi",
+          tags: [],
+          occasions: ["everyday"],
+        });
+      } catch (cause) {
+        // Keep the shot on screen: it isn't saved, and retaking it won't help.
+        if (cause instanceof StorageFullError) {
+          setSaveError(
+            "No room left on this device. Delete a few items from your closet, then tap the category again.",
+          );
+          return;
+        }
+        throw cause;
+      }
+      setSaveError(null);
       setSavedCategory(category);
       setAddedCount((n) => n + 1);
       setPhase("saved");
@@ -232,6 +247,12 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
       <div className="shrink-0 bg-shell px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-4">
         {phase === "review" && shot ? (
           <div className="animate-rise space-y-4">
+            {saveError ? (
+              <p className="mx-auto max-w-xs rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-center text-sm">
+                {saveError}
+              </p>
+            ) : null}
+
             <p className="text-center text-xs text-white/55">
               {shot.backgroundRemoved
                 ? "Background removed and cropped."
