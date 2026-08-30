@@ -50,23 +50,24 @@ badly for photographs.
 
 ## The sample closet
 
-On a first run the app seeds **32 items**: 17 wardrobe staples as examples, plus
-a catalogued sneaker collection — seven Air Foamposite One colourways (Eggplant,
-Galaxy, Copper, Cough Drop, Triple White, Black Volt, Tekken 8), six Jordan
-retros, a black tee and blue jeans — which are treated as yours, not as demo
-filler, and survive "Clear examples".
+On a first run the app seeds **55 items**: 17 wardrobe staples as examples,
+plus a catalogued collection treated as yours (not demo filler, and untouched by
+"Clear examples") — seven Air Foamposite One colourways, seven Jordan retros,
+six Yeezy silhouettes, Nike Dunks, two Timberland 6" boots, varsity and bomber
+jackets, oversized earth-tone hoodies, cargo and parachute pants, several pairs
+of jeans, a Yankees cap and a Louis Vuitton scarf.
 
-The wardrobe staples are **17 example items** — Air Jordan 1s, black leather
-boots, a white dress shirt, black jeans, a suit jacket, a leather jacket, a
-two-tone watch and so on — so the catalog, the filters and the outfit
-suggestions all do something before you've photographed anything. Every occasion
-("job interview", "casual weekend", "date night"…) yields a complete outfit.
+The wardrobe staples are the **example items**, and the banner at the top of the
+closet clears them in one tap.
 
 Photography is **real product and garment photography referenced by URL**, not
-bundled into the repo. Staples come from Unsplash; the sneakers come from
-StockX's product CDN, because no free-licensed Foamposite photography exists on
+bundled into the repo. Staples and streetwear come from Unsplash; sneakers and boots come from StockX's
+product CDN, because no free-licensed Foamposite or Yeezy photography exists on
 Unsplash, Pexels or Wikimedia and labelling a picture of a different shoe as a
-Foamposite would be a lie the catalog repeats forever. StockX shots are a
+Foamposite would be a lie the catalog repeats forever. Two items — a Louis
+Vuitton scarf and a New York team jacket — carry no photo at all for the same
+reason: nothing verifiable exists, so they are catalogued with their tags and a
+"no photo yet" tile that opens the camera. StockX shots are a
 retailer's copyrighted images — fine for a personal catalog, worth replacing
 with your own captures before this is ever public. Referencing by URL also means
 the samples — which means the samples exercise the same
@@ -81,6 +82,16 @@ mix into anything you add. To change them, edit `SAMPLES` in `src/lib/seed.ts`.
 
 Because the photos are remote, the sample closet needs a network connection;
 anything you capture yourself is stored locally and works offline.
+
+## Mobile
+
+Every interactive control meets a 44px minimum touch target, the bottom nav and
+the camera controls respect `env(safe-area-inset-bottom)` so nothing sits under
+the home indicator, and no page scrolls horizontally at 390px. Filter and
+occasion rows scroll horizontally on purpose, inside their own containers.
+
+Verified with Chrome device emulation at 390×844: the audit script checks
+`scrollWidth` against `clientWidth` and measures every button, link and input.
 
 ## Getting started
 

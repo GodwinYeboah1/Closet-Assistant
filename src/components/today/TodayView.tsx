@@ -41,7 +41,7 @@ export default function TodayView() {
           <section className="rounded-2xl border border-line bg-surface p-4">
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="text-sm font-medium">Wear today</h2>
-              <Link href="/outfits" className="text-sm text-muted underline-offset-4 hover:underline">
+              <Link href="/outfits" className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline">
                 More options
               </Link>
             </div>
@@ -62,7 +62,7 @@ export default function TodayView() {
               <h2 className="text-sm font-medium">
                 {resting.length ? "Haven't worn in a while" : "Recently added"}
               </h2>
-              <Link href="/closet" className="text-sm text-muted underline-offset-4 hover:underline">
+              <Link href="/closet" className="-mr-2 inline-flex min-h-11 items-center px-2 text-sm text-muted underline-offset-4 hover:underline">
                 All {items.length}
               </Link>
             </div>

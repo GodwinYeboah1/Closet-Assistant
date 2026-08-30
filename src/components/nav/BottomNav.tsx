@@ -16,8 +16,8 @@ export default function BottomNav() {
   if (pathname === "/capture") return null;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-2.5">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+      <div className="mx-auto flex max-w-2xl items-center justify-between gap-1 px-3 py-2 sm:px-6">
         {LINKS.map((link) => {
           const active =
             link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
@@ -26,7 +26,7 @@ export default function BottomNav() {
               key={link.href}
               href={link.href}
               aria-current={active ? "page" : undefined}
-              className={`rounded-full px-4 py-2 text-sm transition-colors ${
+              className={`inline-flex min-h-11 items-center rounded-full px-3.5 text-sm transition-colors sm:px-4 ${
                 active ? "bg-accent-soft text-accent font-medium" : "text-muted hover:text-ink"
               }`}
             >
@@ -37,7 +37,7 @@ export default function BottomNav() {
 
         <Link
           href="/capture"
-          className="flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-canvas transition-transform active:scale-95"
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-ink px-4 text-sm font-medium text-canvas transition-transform active:scale-95"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path

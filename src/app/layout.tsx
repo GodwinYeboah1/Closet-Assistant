@@ -27,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <SeedSamples />
-        <div className="flex-1 pb-20">{children}</div>
+        <div className="flex-1 pb-28">{children}</div>
         <BottomNav />
       </body>
     </html>

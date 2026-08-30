@@ -12,7 +12,7 @@ export default function CategoryStrip({ onPick }: { onPick: (category: Category)
           type="button"
           onClick={() => onPick(category)}
           style={{ animationDelay: `${index * 28}ms` }}
-          className="animate-rise shrink-0 rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-medium text-white backdrop-blur transition-transform active:scale-95 hover:bg-white/20"
+          className="animate-rise inline-flex min-h-12 shrink-0 items-center rounded-full border border-white/25 bg-white/10 px-4 text-sm font-medium text-white backdrop-blur transition-transform active:scale-95 hover:bg-white/20"
         >
           {CATEGORY_LABELS[category]}
         </button>

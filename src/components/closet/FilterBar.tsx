@@ -55,7 +55,7 @@ export default function FilterBar({
       </div>
 
       <div className="flex items-center gap-3 overflow-x-auto pb-1">
-        <div className="flex shrink-0 gap-1.5">
+        <div className="flex shrink-0 gap-0.5">
           {colors.map((value) => (
             <button
               key={value}
@@ -63,13 +63,16 @@ export default function FilterBar({
               aria-label={value}
               aria-pressed={color === value}
               onClick={() => onColor(color === value ? null : value)}
-              className={`h-6 w-6 rounded-full border transition-transform active:scale-90 ${
-                color === value
-                  ? "border-accent ring-2 ring-accent/40 scale-110"
-                  : "border-line"
-              }`}
-              style={{ backgroundColor: COLOR_SWATCHES[value] }}
-            />
+              className="grid h-11 w-11 shrink-0 place-items-center transition-transform active:scale-90"
+            >
+              {/* 44px hit area, 26px dot — the target has to be thumb-sized. */}
+              <span
+                className={`h-[26px] w-[26px] rounded-full border ${
+                  color === value ? "border-accent ring-2 ring-accent/50" : "border-line"
+                }`}
+                style={{ backgroundColor: COLOR_SWATCHES[value] }}
+              />
+            </button>
           ))}
         </div>
 
@@ -103,7 +106,7 @@ function Chip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+      className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm transition-colors ${
         active
           ? "border-accent bg-accent-soft text-accent font-medium"
           : "border-line bg-surface text-muted hover:text-ink"

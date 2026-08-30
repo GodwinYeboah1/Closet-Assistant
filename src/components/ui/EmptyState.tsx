@@ -16,7 +16,7 @@ export default function EmptyState({
       {cta ? (
         <Link
           href={cta.href}
-          className="mt-6 inline-flex rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-canvas transition-transform active:scale-95"
+          className="mt-6 inline-flex min-h-11 items-center rounded-full bg-ink px-5 text-sm font-medium text-canvas transition-transform active:scale-95"
         >
           {cta.label}
         </Link>

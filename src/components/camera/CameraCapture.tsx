@@ -187,7 +187,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
             type="button"
             onClick={close}
             aria-label="Close camera"
-            className="rounded-full bg-black/45 p-2.5 backdrop-blur transition-transform active:scale-90"
+            className="grid h-11 w-11 place-items-center rounded-full bg-black/45 backdrop-blur transition-transform active:scale-90"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -205,7 +205,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
               type="button"
               onClick={() => setFacing((f) => (f === "environment" ? "user" : "environment"))}
               aria-label="Switch camera"
-              className="rounded-full bg-black/45 p-2.5 backdrop-blur transition-transform active:scale-90"
+              className="grid h-11 w-11 place-items-center rounded-full bg-black/45 backdrop-blur transition-transform active:scale-90"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
@@ -229,7 +229,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
         ) : null}
       </div>
 
-      <div className="shrink-0 bg-shell px-5 pb-8 pt-4">
+      <div className="shrink-0 bg-shell px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-4">
         {phase === "review" && shot ? (
           <div className="animate-rise space-y-4">
             <p className="text-center text-xs text-white/55">
@@ -243,7 +243,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
               <button
                 type="button"
                 onClick={attachPhoto}
-                className="mx-auto block rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition-transform active:scale-95"
+                className="mx-auto flex min-h-11 items-center rounded-full bg-white px-5 text-sm font-medium text-black transition-transform active:scale-95"
               >
                 Save photo to {attachTarget?.name ?? "this item"}
               </button>
@@ -254,7 +254,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
             <button
               type="button"
               onClick={retake}
-              className="mx-auto block px-4 py-2 text-sm text-white/70 underline-offset-4 hover:underline"
+              className="mx-auto flex min-h-11 items-center px-4 text-sm text-white/70 underline-offset-4 hover:underline"
             >
               Retake
             </button>
@@ -268,7 +268,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="rounded-full border border-white/25 px-4 py-2 text-sm text-white/85 transition-transform active:scale-95"
+              className="inline-flex min-h-11 items-center rounded-full border border-white/25 px-4 text-sm text-white/85 transition-transform active:scale-95"
             >
               Library
             </button>
@@ -286,7 +286,7 @@ export default function CameraCapture({ attachToId }: { attachToId?: string }) {
             <button
               type="button"
               onClick={close}
-              className="w-[74px] text-right text-sm text-white/70 transition-transform active:scale-95"
+              className="inline-flex min-h-11 w-[74px] items-center justify-end text-sm text-white/70 transition-transform active:scale-95"
             >
               Done
             </button>

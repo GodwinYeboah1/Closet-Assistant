@@ -53,7 +53,7 @@ export default function OutfitBoard() {
               setWorn(false);
             }}
             aria-pressed={occasion === value}
-            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+            className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm transition-colors ${
               occasion === value
                 ? "border-accent bg-accent-soft text-accent font-medium"
                 : "border-line bg-surface text-muted hover:text-ink"
@@ -91,7 +91,7 @@ export default function OutfitBoard() {
                   setSeed((n) => n + 1);
                   setWorn(false);
                 }}
-                className="rounded-full border border-line px-4 py-2 text-sm transition-transform active:scale-95"
+                className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm transition-transform active:scale-95"
               >
                 Try another
               </button>
@@ -107,7 +107,7 @@ export default function OutfitBoard() {
                   });
                   setWorn(true);
                 }}
-                className="rounded-full bg-ink px-4 py-2 text-sm font-medium text-canvas transition-transform active:scale-95 disabled:opacity-50"
+                className="inline-flex min-h-11 items-center rounded-full bg-ink px-4 text-sm font-medium text-canvas transition-transform active:scale-95 disabled:opacity-50"
               >
                 {worn ? "Logged for today" : "Wearing this"}
               </button>

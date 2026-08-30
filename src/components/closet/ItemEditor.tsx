@@ -69,7 +69,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
 
   return (
     <main className="mx-auto max-w-2xl px-5 pb-10 pt-6">
-      <Link href="/closet" className="text-sm text-muted underline-offset-4 hover:underline">
+      <Link href="/closet" className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline">
         ← Closet
       </Link>
 
@@ -88,28 +88,28 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
         )}
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <p className="font-mono text-xs text-muted">
           {lastWornLabel(item.lastWornAt)} · worn {item.wearCount}×
         </p>
-        <div className="flex gap-2">
+        <div className="ml-auto flex flex-wrap gap-2">
           <Link
             href={`/capture?itemId=${item.id}`}
-            className="rounded-full border border-line px-3 py-1.5 text-xs"
+            className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-xs"
           >
             {item.photoUrl ? "Retake" : "Add photo"}
           </Link>
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-full border border-line px-3 py-1.5 text-xs"
+            className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-xs"
           >
             Library
           </button>
           <button
             type="button"
             onClick={() => markWorn(item.id)}
-            className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-canvas transition-transform active:scale-95"
+            className="inline-flex min-h-11 items-center rounded-full bg-ink px-4 text-xs font-medium text-canvas transition-transform active:scale-95"
           >
             Worn today
           </button>
@@ -121,7 +121,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
           value={item.name ?? ""}
           onChange={(event) => patch({ name: event.target.value })}
           placeholder={CATEGORY_LABELS[item.category]}
-          className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+          className="min-h-11 w-full rounded-xl border border-line bg-surface px-3.5 text-sm outline-none focus:border-accent"
         />
       </Field>
 
@@ -148,11 +148,15 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
               aria-label={value}
               aria-pressed={item.color === value}
               onClick={() => patch({ color: value })}
-              className={`h-8 w-8 rounded-full border transition-transform active:scale-90 ${
-                item.color === value ? "border-accent ring-2 ring-accent/40" : "border-line"
-              }`}
-              style={{ backgroundColor: COLOR_SWATCHES[value] }}
-            />
+              className="grid h-11 w-11 place-items-center transition-transform active:scale-90"
+            >
+              <span
+                className={`h-8 w-8 rounded-full border ${
+                  item.color === value ? "border-accent ring-2 ring-accent/50" : "border-line"
+                }`}
+                style={{ backgroundColor: COLOR_SWATCHES[value] }}
+              />
+            </button>
           ))}
         </div>
       </Field>
@@ -178,7 +182,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
               key={tag}
               type="button"
               onClick={() => patch({ tags: item.tags.filter((value) => value !== tag) })}
-              className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-muted"
+              className="inline-flex min-h-11 items-center rounded-full border border-line bg-surface px-4 text-sm text-muted"
             >
               {tag} ×
             </button>
@@ -195,12 +199,12 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
               }
             }}
             placeholder="linen, gift, needs repair…"
-            className="flex-1 rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+            className="min-h-11 flex-1 rounded-xl border border-line bg-surface px-3.5 text-sm outline-none focus:border-accent"
           />
           <button
             type="button"
             onClick={addTag}
-            className="rounded-xl border border-line px-4 text-sm"
+            className="min-h-11 rounded-xl border border-line px-4 text-sm"
           >
             Add
           </button>
@@ -217,14 +221,14 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
                 deleteItem(item.id);
                 router.push("/closet");
               }}
-              className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white"
+              className="inline-flex min-h-11 items-center rounded-full bg-accent px-4 text-sm font-medium text-white"
             >
               Delete
             </button>
             <button
               type="button"
               onClick={() => setConfirmingDelete(false)}
-              className="text-sm text-muted"
+              className="inline-flex min-h-11 items-center text-sm text-muted"
             >
               Cancel
             </button>
@@ -233,7 +237,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
-            className="text-sm text-muted underline-offset-4 hover:underline"
+            className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline"
           >
             Delete item
           </button>
@@ -278,7 +282,7 @@ function Toggle({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+      className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors ${
         active ? "border-accent bg-accent-soft text-accent font-medium" : "border-line bg-surface text-muted"
       }`}
     >
