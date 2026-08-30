@@ -38,7 +38,7 @@ export default function TodayView() {
         />
       ) : (
         <div className="space-y-8 px-5">
-          <section className="rounded-2xl border border-line bg-card p-4">
+          <section className="rounded-2xl border border-line bg-surface p-4">
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="text-sm font-medium">Wear today</h2>
               <Link href="/outfits" className="text-sm text-muted underline-offset-4 hover:underline">

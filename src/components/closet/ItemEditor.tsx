@@ -72,12 +72,12 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
         ← Closet
       </Link>
 
-      <div className="photo-plate mt-4 aspect-square overflow-hidden rounded-3xl border border-line">
+      <div className="photo-tile mt-4 aspect-square rounded-2xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={item.photoUrl}
           alt={item.name ?? CATEGORY_LABELS[item.category]}
-          className="h-full w-full object-contain p-6"
+          className="h-full w-full object-cover"
         />
       </div>
 
@@ -96,7 +96,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
           <button
             type="button"
             onClick={() => markWorn(item.id)}
-            className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper transition-transform active:scale-95"
+            className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-canvas transition-transform active:scale-95"
           >
             Worn today
           </button>
@@ -108,7 +108,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
           value={item.name ?? ""}
           onChange={(event) => patch({ name: event.target.value })}
           placeholder={CATEGORY_LABELS[item.category]}
-          className="w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-sm outline-none focus:border-clay"
+          className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm outline-none focus:border-accent"
         />
       </Field>
 
@@ -136,7 +136,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
               aria-pressed={item.color === value}
               onClick={() => patch({ color: value })}
               className={`h-8 w-8 rounded-full border transition-transform active:scale-90 ${
-                item.color === value ? "border-clay ring-2 ring-clay/40" : "border-line"
+                item.color === value ? "border-accent ring-2 ring-accent/40" : "border-line"
               }`}
               style={{ backgroundColor: COLOR_SWATCHES[value] }}
             />
@@ -165,7 +165,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
               key={tag}
               type="button"
               onClick={() => patch({ tags: item.tags.filter((value) => value !== tag) })}
-              className="rounded-full border border-line bg-card px-3 py-1.5 text-sm text-muted"
+              className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-muted"
             >
               {tag} ×
             </button>
@@ -182,7 +182,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
               }
             }}
             placeholder="linen, gift, needs repair…"
-            className="flex-1 rounded-xl border border-line bg-card px-3.5 py-2.5 text-sm outline-none focus:border-clay"
+            className="flex-1 rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm outline-none focus:border-accent"
           />
           <button
             type="button"
@@ -204,7 +204,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
                 deleteItem(item.id);
                 router.push("/closet");
               }}
-              className="rounded-full bg-clay px-4 py-2 text-sm font-medium text-white"
+              className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white"
             >
               Delete
             </button>
@@ -245,7 +245,7 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="mt-7">
-      <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">{label}</h2>
+      <h2 className="eyebrow mb-2 text-muted">{label}</h2>
       {children}
     </section>
   );
@@ -266,7 +266,7 @@ function Toggle({
       onClick={onClick}
       aria-pressed={active}
       className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
-        active ? "border-clay bg-clay-soft text-clay font-medium" : "border-line bg-card text-muted"
+        active ? "border-accent bg-accent-soft text-accent font-medium" : "border-line bg-surface text-muted"
       }`}
     >
       {children}

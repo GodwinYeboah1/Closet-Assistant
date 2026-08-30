@@ -13,7 +13,7 @@ export default function SavedConfirmation({
   return (
     <div className="absolute inset-0 grid place-items-center bg-shell/80 backdrop-blur-sm">
       <div className="animate-rise flex flex-col items-center gap-3">
-        <span className="grid h-16 w-16 place-items-center rounded-full bg-clay">
+        <span className="grid h-16 w-16 place-items-center rounded-full bg-accent">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path
               className="animate-stroke"

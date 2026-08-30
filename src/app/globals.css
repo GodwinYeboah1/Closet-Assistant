@@ -1,67 +1,79 @@
 @import "tailwindcss";
 
 /*
- * Closet Assistant — "workshop light" direction.
- * Warm paper ground, ink text, one clay accent used only for the shutter and
- * primary actions. Camera surfaces invert to near-black so the viewfinder reads
- * like a native camera rather than a page with a video on it.
+ * Closet Assistant — "gallery" direction.
+ *
+ * Rebuilt around real garment photography. The previous paper-and-checkerboard
+ * treatment was designed for transparent cut-outs; photographs need the
+ * opposite — a dark, quiet ground that lets the images carry all the colour,
+ * and chrome that gets out of the way. Dark is the default here; light is the
+ * override, not the other way round.
  */
 
 :root {
-  --paper: #f7f6f2;
-  --card: #ffffff;
-  --ink: #14161a;
-  --muted: #6e6a62;
-  --line: #e5e2da;
-  --clay: #b4613f;
-  --clay-soft: #f3e6df;
-  --shell: #101114;
+  --canvas: #0d0e10;
+  --surface: #16181b;
+  --raised: #1e2126;
+  --ink: #f3f2ef;
+  --muted: #98958e;
+  --line: #262a2f;
+  --accent: #e0603c;
+  --accent-soft: #2b1a14;
+  --shell: #08090a;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --paper: #121316;
-    --card: #1a1c20;
-    --ink: #edebe6;
-    --muted: #9a968d;
-    --line: #2a2d33;
-    --clay: #c9714c;
-    --clay-soft: #2c211c;
-    --shell: #0a0b0d;
+    --canvas: #f4f3f0;
+    --surface: #ffffff;
+    --raised: #ffffff;
+    --ink: #14161a;
+    --muted: #6b6862;
+    --line: #e3e0d9;
+    --accent: #bf5230;
+    --accent-soft: #f7e7e0;
+    /* The camera stays dark in both themes — a viewfinder is not a document. */
+    --shell: #08090a;
   }
 }
 
 @theme inline {
-  --color-paper: var(--paper);
-  --color-card: var(--card);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
-  --color-clay: var(--clay);
-  --color-clay-soft: var(--clay-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
   --color-shell: var(--shell);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--paper);
+  background: var(--canvas);
   color: var(--ink);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Checkerboard behind knocked-out item photos, so transparency reads as intent. */
-.photo-plate {
-  background-color: var(--card);
-  background-image:
-    linear-gradient(45deg, var(--line) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--line) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--line) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--line) 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
-  opacity: 1;
+/*
+ * Photo tiles. Real photographs are cropped square upstream and captured
+ * cut-outs are already square, so `object-cover` is safe for both; the tint
+ * underneath is what a transparent cut-out shows through to.
+ */
+.photo-tile {
+  background-color: var(--raised);
+  overflow: hidden;
+}
+
+/* Micro-label: the one typographic signature of this direction. */
+.eyebrow {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 @keyframes shutter-flash {

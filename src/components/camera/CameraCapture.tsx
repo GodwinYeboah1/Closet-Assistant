@@ -257,7 +257,7 @@ export default function CameraCapture() {
               aria-label="Take photo"
               className="group relative grid h-[70px] w-[70px] place-items-center rounded-full border-[3px] border-white/85 transition-transform active:scale-90 disabled:opacity-40"
             >
-              <span className="h-[54px] w-[54px] rounded-full bg-clay transition-transform group-active:scale-90" />
+              <span className="h-[54px] w-[54px] rounded-full bg-accent transition-transform group-active:scale-90" />
             </button>
 
             <button

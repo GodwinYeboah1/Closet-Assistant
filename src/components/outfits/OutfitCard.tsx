@@ -10,13 +10,14 @@ export default function OutfitCard({ items }: { items: ClothingItem[] }) {
           key={item.id}
           href={`/closet/${item.id}`}
           style={{ animationDelay: `${index * 45}ms` }}
-          className="animate-rise photo-plate aspect-square w-28 shrink-0 overflow-hidden rounded-2xl border border-line sm:w-32"
+          className="animate-rise photo-tile aspect-square w-28 shrink-0 rounded-xl sm:w-32"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={item.photoUrl}
             alt={item.name ?? CATEGORY_LABELS[item.category]}
-            className="h-full w-full object-contain p-2.5"
+            loading="lazy"
+            className="h-full w-full object-cover"
           />
         </Link>
       ))}

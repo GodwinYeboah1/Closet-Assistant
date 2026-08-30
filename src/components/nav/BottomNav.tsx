@@ -16,7 +16,7 @@ export default function BottomNav() {
   if (pathname === "/capture") return null;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card/95 backdrop-blur">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur">
       <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-2.5">
         {LINKS.map((link) => {
           const active =
@@ -27,7 +27,7 @@ export default function BottomNav() {
               href={link.href}
               aria-current={active ? "page" : undefined}
               className={`rounded-full px-4 py-2 text-sm transition-colors ${
-                active ? "bg-clay-soft text-clay font-medium" : "text-muted hover:text-ink"
+                active ? "bg-accent-soft text-accent font-medium" : "text-muted hover:text-ink"
               }`}
             >
               {link.label}
@@ -37,7 +37,7 @@ export default function BottomNav() {
 
         <Link
           href="/capture"
-          className="flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper transition-transform active:scale-95"
+          className="flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-canvas transition-transform active:scale-95"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path

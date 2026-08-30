@@ -6,6 +6,7 @@ import { useCloset } from "@/lib/useCloset";
 import type { Category, ColorName } from "@/lib/types";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
+import SampleBanner from "@/components/samples/SampleBanner";
 import FilterBar, { type SortKey } from "./FilterBar";
 import ItemCard from "./ItemCard";
 
@@ -31,6 +32,8 @@ export default function ClosetView() {
     return sorted;
   }, [items, category, color, sort]);
 
+  const sampleCount = items.filter((item) => item.isSample).length;
+
   if (!ready) return null;
 
   return (
@@ -52,6 +55,7 @@ export default function ClosetView() {
         />
       ) : (
         <>
+          {sampleCount > 0 ? <SampleBanner count={sampleCount} /> : null}
           <FilterBar
             items={items}
             category={category}

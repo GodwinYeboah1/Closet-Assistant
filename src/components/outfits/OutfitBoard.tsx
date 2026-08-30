@@ -55,8 +55,8 @@ export default function OutfitBoard() {
             aria-pressed={occasion === value}
             className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
               occasion === value
-                ? "border-clay bg-clay-soft text-clay font-medium"
-                : "border-line bg-card text-muted hover:text-ink"
+                ? "border-accent bg-accent-soft text-accent font-medium"
+                : "border-line bg-surface text-muted hover:text-ink"
             }`}
           >
             {OCCASION_LABELS[value]}
@@ -64,7 +64,7 @@ export default function OutfitBoard() {
         ))}
       </div>
 
-      <section className="mx-5 rounded-2xl border border-line bg-card p-4">
+      <section className="mx-5 rounded-2xl border border-line bg-surface p-4">
         {suggestion.items.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted">
             Nothing in the closet fits this yet.
@@ -107,7 +107,7 @@ export default function OutfitBoard() {
                   });
                   setWorn(true);
                 }}
-                className="rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper transition-transform active:scale-95 disabled:opacity-50"
+                className="rounded-full bg-ink px-4 py-2 text-sm font-medium text-canvas transition-transform active:scale-95 disabled:opacity-50"
               >
                 {worn ? "Logged for today" : "Wearing this"}
               </button>

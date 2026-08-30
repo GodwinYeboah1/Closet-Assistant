@@ -31,9 +31,15 @@ The decisions that follow from it:
 
 ## Design direction
 
-"Workshop light" — warm paper ground for reading and browsing, near-black
-edge-to-edge for the camera. One clay accent, used only for the shutter and
-primary actions; the garment photos supply the rest of the colour.
+"Gallery" — dark by default, built around real garment photography. The grid is
+made of full-bleed image tiles on a near-black ground with no card borders, so
+the photos carry all the colour and the chrome recedes. One warm ember accent,
+used only for the shutter, primary actions and active filters. Light mode is the
+override rather than the default; the camera surface stays dark in both.
+
+This replaced an earlier warm-paper direction built around transparent cut-outs
+on a checkerboard plate — a treatment that reads well for knocked-out PNGs and
+badly for photographs.
 
 - **Base reference:** [Cloud Closet App — UI/UX Case Study](https://dribbble.com/shots/21699983-Cloud-Closet-App-UI-UX-Case-Study)
   for structure, [Clothes Scanning App](https://dribbble.com/shots/6750416-Clothes-Scanning-App)
@@ -41,6 +47,28 @@ primary actions; the garment photos supply the rest of the colour.
 - **Type:** Geist Sans for the interface, Geist Mono for metadata (wear counts,
   "worn 12 days ago") — the one deliberate signal that this is an instrument.
 - **Palette tokens:** defined in `src/app/globals.css`, light and dark.
+
+## The sample closet
+
+On a first run the app seeds **17 example items** — Air Jordan 1s, black leather
+boots, a white dress shirt, black jeans, a suit jacket, a leather jacket, a
+two-tone watch and so on — so the catalog, the filters and the outfit
+suggestions all do something before you've photographed anything. Every occasion
+("job interview", "casual weekend", "date night"…) yields a complete outfit.
+
+These use **real garment photography** hosted by Unsplash and referenced by URL,
+not bundled into the repo — which means the samples exercise the same
+remote-`photoUrl` path a real item will once there's object storage behind it.
+Unsplash photos are free to use commercially and need no attribution; every
+image was reviewed individually before being added. Item names describe what is
+in the photograph and are not a claim about who made or owns the garment.
+
+Each sample is flagged `isSample`, and the banner at the top of the closet
+clears them all in one tap; once cleared they don't come back, and they never
+mix into anything you add. To change them, edit `SAMPLES` in `src/lib/seed.ts`.
+
+Because the photos are remote, the sample closet needs a network connection;
+anything you capture yourself is stored locally and works offline.
 
 ## Getting started
 
@@ -74,6 +102,7 @@ src/
     globals.css              Design tokens + keyframes
   components/
     camera/                  CameraCapture, CategoryStrip, SavedConfirmation
+    samples/                 First-run seeding + "clear examples" banner
     closet/                  ClosetView, ItemCard, FilterBar, ItemEditor
     outfits/                 OutfitBoard, OutfitCard
     today/                   TodayView
@@ -84,6 +113,7 @@ src/
     useCloset.ts             useSyncExternalStore bindings over the store
     image.ts                 Auto-crop + background knockout, with bail-outs
     color.ts                 RGB → colour bucket
+    seed.ts                  The 17-item sample closet (real photography)
     suggest.ts               Deterministic outfit ranker
     format.ts                "Worn 12 days ago"
 docs/creative-brief.md       Research and design decisions
@@ -96,6 +126,9 @@ accessory), `color`, `tags[]`, `occasions[]`, `name?`, `lastWornAt`,
 `wearCount`, `createdAt`.
 
 `Outfit` — `itemIds[]`, `occasion`, `note?`, `wornAt`, `createdAt`.
+
+Seeded examples carry `isSample: true`; nothing else distinguishes them, so they
+behave exactly like real items until you clear them.
 
 ## How the photo clean-up works
 

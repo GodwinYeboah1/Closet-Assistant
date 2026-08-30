@@ -15,6 +15,7 @@ import type { ClothingItem, NewClothingItem, Outfit } from "./types";
 
 const ITEMS_KEY = "closet-assistant:items:v1";
 const OUTFITS_KEY = "closet-assistant:outfits:v1";
+const SEEDED_KEY = "closet-assistant:seeded:v1";
 const CHANGE_EVENT = "closet-assistant:change";
 
 /** Cached so `useSyncExternalStore` gets a referentially stable snapshot. */
@@ -110,6 +111,33 @@ export function saveOutfit(
   const outfit: Outfit = { ...input, id: id(), createdAt: new Date().toISOString() };
   write(OUTFITS_KEY, [outfit, ...read<Outfit>(OUTFITS_KEY)]);
   return outfit;
+}
+
+/**
+ * Fills an empty closet with the sample items, once ever. The flag is what stops
+ * them reappearing after the user clears them or deletes their way to zero.
+ */
+export function seedSamplesIfEmpty(build: () => ClothingItem[]): void {
+  if (typeof window === "undefined") return;
+  if (window.localStorage.getItem(SEEDED_KEY)) return;
+  window.localStorage.setItem(SEEDED_KEY, new Date().toISOString());
+  if (read<ClothingItem>(ITEMS_KEY).length > 0) return;
+  write(ITEMS_KEY, build());
+}
+
+/** Removes every seeded item, leaving anything the user photographed alone. */
+export function clearSamples(): void {
+  const remaining = read<ClothingItem>(ITEMS_KEY).filter((item) => !item.isSample);
+  const removedIds = new Set(
+    read<ClothingItem>(ITEMS_KEY)
+      .filter((item) => item.isSample)
+      .map((item) => item.id),
+  );
+  write(ITEMS_KEY, remaining);
+  write(
+    OUTFITS_KEY,
+    read<Outfit>(OUTFITS_KEY).filter((fit) => !fit.itemIds.some((id) => removedIds.has(id))),
+  );
 }
 
 /** Subscribe to any store write, including writes from another tab. */

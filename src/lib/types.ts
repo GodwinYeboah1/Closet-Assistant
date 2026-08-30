@@ -98,6 +98,8 @@ export type ClothingItem = {
   lastWornAt: string | null;
   wearCount: number;
   createdAt: string;
+  /** Seeded demo item. Lets the user wipe the examples without touching real ones. */
+  isSample?: boolean;
 };
 
 export type Outfit = {

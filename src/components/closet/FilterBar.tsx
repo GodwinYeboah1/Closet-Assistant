@@ -65,7 +65,7 @@ export default function FilterBar({
               onClick={() => onColor(color === value ? null : value)}
               className={`h-6 w-6 rounded-full border transition-transform active:scale-90 ${
                 color === value
-                  ? "border-clay ring-2 ring-clay/40 scale-110"
+                  ? "border-accent ring-2 ring-accent/40 scale-110"
                   : "border-line"
               }`}
               style={{ backgroundColor: COLOR_SWATCHES[value] }}
@@ -105,8 +105,8 @@ function Chip({
       aria-pressed={active}
       className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
         active
-          ? "border-clay bg-clay-soft text-clay font-medium"
-          : "border-line bg-card text-muted hover:text-ink"
+          ? "border-accent bg-accent-soft text-accent font-medium"
+          : "border-line bg-surface text-muted hover:text-ink"
       }`}
     >
       {children}
