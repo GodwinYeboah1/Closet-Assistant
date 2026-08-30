@@ -20,6 +20,9 @@
   --accent: #e0603c;
   --accent-soft: #2b1a14;
   --shell: #08090a;
+  /* White in both themes: the photography is shot on white, so any tint shows
+     up as a visible seam around the product. */
+  --tile: #ffffff;
 }
 
 @media (prefers-color-scheme: light) {
@@ -32,6 +35,7 @@
     --line: #e3e0d9;
     --accent: #bf5230;
     --accent-soft: #f7e7e0;
+    --tile: #ffffff;
     /* The camera stays dark in both themes — a viewfinder is not a document. */
     --shell: #08090a;
   }
@@ -47,6 +51,7 @@
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-shell: var(--shell);
+  --color-tile: var(--tile);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -59,12 +64,13 @@ body {
 }
 
 /*
- * Photo tiles. Real photographs are cropped square upstream and captured
- * cut-outs are already square, so `object-cover` is safe for both; the tint
- * underneath is what a transparent cut-out shows through to.
+ * Photo tiles. Garments are contained, never cropped — a product shot with the
+ * toe or heel sliced off is worse than a little empty space, and the whole
+ * point of the catalog is recognising the item at a glance. The plate stays
+ * light in both themes because the photography is shot on white.
  */
 .photo-tile {
-  background-color: var(--raised);
+  background-color: var(--tile);
   overflow: hidden;
 }
 

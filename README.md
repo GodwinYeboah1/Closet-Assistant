@@ -50,14 +50,26 @@ badly for photographs.
 
 ## The sample closet
 
-On a first run the app seeds **17 example items** — Air Jordan 1s, black leather
+On a first run the app seeds **32 items**: 17 wardrobe staples as examples, plus
+a catalogued sneaker collection — seven Air Foamposite One colourways (Eggplant,
+Galaxy, Copper, Cough Drop, Triple White, Black Volt, Tekken 8), six Jordan
+retros, a black tee and blue jeans — which are treated as yours, not as demo
+filler, and survive "Clear examples".
+
+The wardrobe staples are **17 example items** — Air Jordan 1s, black leather
 boots, a white dress shirt, black jeans, a suit jacket, a leather jacket, a
 two-tone watch and so on — so the catalog, the filters and the outfit
 suggestions all do something before you've photographed anything. Every occasion
 ("job interview", "casual weekend", "date night"…) yields a complete outfit.
 
-These use **real garment photography** hosted by Unsplash and referenced by URL,
-not bundled into the repo — which means the samples exercise the same
+Photography is **real product and garment photography referenced by URL**, not
+bundled into the repo. Staples come from Unsplash; the sneakers come from
+StockX's product CDN, because no free-licensed Foamposite photography exists on
+Unsplash, Pexels or Wikimedia and labelling a picture of a different shoe as a
+Foamposite would be a lie the catalog repeats forever. StockX shots are a
+retailer's copyrighted images — fine for a personal catalog, worth replacing
+with your own captures before this is ever public. Referencing by URL also means
+the samples — which means the samples exercise the same
 remote-`photoUrl` path a real item will once there's object storage behind it.
 Unsplash photos are free to use commercially and need no attribution; every
 image was reviewed individually before being added. Item names describe what is
@@ -103,7 +115,7 @@ src/
   components/
     camera/                  CameraCapture, CategoryStrip, SavedConfirmation
     samples/                 First-run seeding + "clear examples" banner
-    closet/                  ClosetView, ItemCard, FilterBar, ItemEditor
+    closet/                  ClosetView, ItemCard, FilterBar, ItemEditor, PhotoPending
     outfits/                 OutfitBoard, OutfitCard
     today/                   TodayView
     nav/, ui/                Bottom nav, page header, empty state
@@ -113,7 +125,7 @@ src/
     useCloset.ts             useSyncExternalStore bindings over the store
     image.ts                 Auto-crop + background knockout, with bail-outs
     color.ts                 RGB → colour bucket
-    seed.ts                  The 17-item sample closet (real photography)
+    seed.ts                  Starter closet: staples + the sneaker collection
     suggest.ts               Deterministic outfit ranker
     format.ts                "Worn 12 days ago"
 docs/creative-brief.md       Research and design decisions
@@ -121,7 +133,8 @@ docs/creative-brief.md       Research and design decisions
 
 ## Data models (placeholder)
 
-`ClothingItem` — `photoUrl`, `category` (shoes / shirt / pants / jacket /
+`ClothingItem` — `photoUrl` (`null` for an item catalogued but not yet
+photographed), `category` (shoes / shirt / pants / jacket /
 accessory), `color`, `tags[]`, `occasions[]`, `name?`, `lastWornAt`,
 `wearCount`, `createdAt`.
 

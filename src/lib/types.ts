@@ -85,8 +85,12 @@ export const OCCASION_LABELS: Record<Occasion, string> = {
 
 export type ClothingItem = {
   id: string;
-  /** Data URL for the scaffold; an object-storage URL once a backend exists. */
-  photoUrl: string;
+  /**
+   * Data URL for the scaffold; an object-storage URL once a backend exists.
+   * `null` means the item is catalogued but not yet photographed — you can log
+   * something you own now and shoot it later.
+   */
+  photoUrl: string | null;
   category: Category;
   color: ColorName;
   /** Free-form user tags: "linen", "work shoes", "gift from mum". */

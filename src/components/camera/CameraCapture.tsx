@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { nearestColorName } from "@/lib/color";
 import { dominantColor, processCapture, type ProcessedCapture } from "@/lib/image";
-import { addItem } from "@/lib/store";
+import { addItem, updateItem } from "@/lib/store";
 import type { Category } from "@/lib/types";
+import { useItem } from "@/lib/useCloset";
 import CategoryStrip from "./CategoryStrip";
 import SavedConfirmation from "./SavedConfirmation";
 
@@ -16,8 +17,10 @@ type Phase = "starting" | "live" | "review" | "saved" | "blocked";
  * category -> saved. The camera is never torn down between items, so adding a
  * whole shelf is shutter, tap, shutter, tap.
  */
-export default function CameraCapture() {
+export default function CameraCapture({ attachToId }: { attachToId?: string }) {
   const router = useRouter();
+  // Attach mode: we already know what this is, so there's nothing to tag.
+  const attachTarget = useItem(attachToId ?? "");
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -113,6 +116,13 @@ export default function CameraCapture() {
     },
     [shot],
   );
+
+  const attachPhoto = useCallback(() => {
+    if (!shot || !attachToId) return;
+    updateItem(attachToId, { photoUrl: shot.dataUrl });
+    stopStream();
+    router.push(`/closet/${attachToId}`);
+  }, [attachToId, router, shot, stopStream]);
 
   const close = useCallback(() => {
     stopStream();
@@ -224,10 +234,23 @@ export default function CameraCapture() {
           <div className="animate-rise space-y-4">
             <p className="text-center text-xs text-white/55">
               {shot.backgroundRemoved
-                ? "Background removed and cropped. Tap a category to save."
-                : "Kept the photo as shot — the background wouldn't separate cleanly. Tap a category to save."}
+                ? "Background removed and cropped."
+                : "Kept the photo as shot — the background wouldn't separate cleanly."}
+              {attachToId ? "" : " Tap a category to save."}
             </p>
-            <CategoryStrip onPick={save} />
+
+            {attachToId ? (
+              <button
+                type="button"
+                onClick={attachPhoto}
+                className="mx-auto block rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition-transform active:scale-95"
+              >
+                Save photo to {attachTarget?.name ?? "this item"}
+              </button>
+            ) : (
+              <CategoryStrip onPick={save} />
+            )}
+
             <button
               type="button"
               onClick={retake}

@@ -17,6 +17,7 @@ import {
   type Occasion,
 } from "@/lib/types";
 import { useItem } from "@/lib/useCloset";
+import PhotoPending from "./PhotoPending";
 
 /** Everything about an item is editable after the fact, photo included. */
 export default function ItemEditor({ itemId }: { itemId: string }) {
@@ -73,12 +74,18 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
       </Link>
 
       <div className="photo-tile mt-4 aspect-square rounded-2xl">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={item.photoUrl}
-          alt={item.name ?? CATEGORY_LABELS[item.category]}
-          className="h-full w-full object-cover"
-        />
+        {item.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={item.photoUrl}
+            alt={item.name ?? CATEGORY_LABELS[item.category]}
+            className="h-full w-full object-contain p-4"
+          />
+        ) : (
+          <Link href={`/capture?itemId=${item.id}`} className="block h-full w-full">
+            <PhotoPending category={item.category} />
+          </Link>
+        )}
       </div>
 
       <div className="mt-3 flex items-center justify-between">
@@ -86,12 +93,18 @@ export default function ItemEditor({ itemId }: { itemId: string }) {
           {lastWornLabel(item.lastWornAt)} · worn {item.wearCount}×
         </p>
         <div className="flex gap-2">
+          <Link
+            href={`/capture?itemId=${item.id}`}
+            className="rounded-full border border-line px-3 py-1.5 text-xs"
+          >
+            {item.photoUrl ? "Retake" : "Add photo"}
+          </Link>
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             className="rounded-full border border-line px-3 py-1.5 text-xs"
           >
-            Replace photo
+            Library
           </button>
           <button
             type="button"

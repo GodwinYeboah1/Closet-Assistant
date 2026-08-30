@@ -16,6 +16,7 @@ import type { ClothingItem, NewClothingItem, Outfit } from "./types";
 const ITEMS_KEY = "closet-assistant:items:v1";
 const OUTFITS_KEY = "closet-assistant:outfits:v1";
 const SEEDED_KEY = "closet-assistant:seeded:v1";
+const SEED_VERSION_KEY = "closet-assistant:seed-version";
 const CHANGE_EVENT = "closet-assistant:change";
 
 /** Cached so `useSyncExternalStore` gets a referentially stable snapshot. */
@@ -114,15 +115,38 @@ export function saveOutfit(
 }
 
 /**
- * Fills an empty closet with the sample items, once ever. The flag is what stops
- * them reappearing after the user clears them or deletes their way to zero.
+ * Seeds a first-run closet, and tops up existing ones when new entries ship.
+ *
+ * Runs at most once per seed version. Demo filler is only topped up while some
+ * filler is still present, so clearing the examples keeps them cleared; items
+ * the owner asked for are always added if missing. Anything deleted before a
+ * version bump can come back once — an acceptable wart for starter data, and
+ * the reason the version only moves when entries are actually added.
  */
-export function seedSamplesIfEmpty(build: () => ClothingItem[]): void {
+export function syncSeed(build: () => ClothingItem[], version: number): void {
   if (typeof window === "undefined") return;
-  if (window.localStorage.getItem(SEEDED_KEY)) return;
-  window.localStorage.setItem(SEEDED_KEY, new Date().toISOString());
-  if (read<ClothingItem>(ITEMS_KEY).length > 0) return;
-  write(ITEMS_KEY, build());
+
+  const firstRun = !window.localStorage.getItem(SEEDED_KEY);
+  const storedVersion = Number(window.localStorage.getItem(SEED_VERSION_KEY) ?? 0);
+  if (!firstRun && storedVersion >= version) return;
+
+  window.localStorage.setItem(SEED_VERSION_KEY, String(version));
+  const existing = read<ClothingItem>(ITEMS_KEY);
+
+  if (firstRun) {
+    window.localStorage.setItem(SEEDED_KEY, new Date().toISOString());
+    if (existing.length === 0) {
+      write(ITEMS_KEY, build());
+      return;
+    }
+  }
+
+  const known = new Set(existing.map((item) => item.id));
+  const samplesStillPresent = existing.some((item) => item.isSample);
+  const additions = build().filter(
+    (item) => !known.has(item.id) && (samplesStillPresent || !item.isSample),
+  );
+  if (additions.length) write(ITEMS_KEY, [...additions, ...existing]);
 }
 
 /** Removes every seeded item, leaving anything the user photographed alone. */

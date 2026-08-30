@@ -17,11 +17,20 @@ import type { ClothingItem, Category, ColorName, Occasion } from "./types";
  */
 
 type SampleSpec = {
+  /** Stable across releases — the top-up seeder matches on it. */
+  id: string;
   name: string;
   category: Category;
   color: ColorName;
-  /** Unsplash photo id — the stable part of an images.unsplash.com URL. */
-  photo: string;
+  /** Unsplash photo id — used for the generic wardrobe staples. */
+  photo?: string;
+  /** StockX product slug — used for specific sneakers, which Unsplash lacks. */
+  sneaker?: string;
+  /**
+   * Demo filler (cleared by "Clear examples") vs. something the owner asked to
+   * catalogue, which behaves like anything they added themselves.
+   */
+  sample?: boolean;
   occasions: Occasion[];
   tags: string[];
   /** Days since last worn; `null` means never worn. */
@@ -31,6 +40,7 @@ type SampleSpec = {
 
 const SAMPLES: SampleSpec[] = [
   {
+    id: "sample-1",
     name: "Air Jordan 1",
     category: "shoes",
     color: "red",
@@ -41,6 +51,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 24,
   },
   {
+    id: "sample-2",
     name: "Black Leather Boots",
     category: "shoes",
     color: "black",
@@ -51,6 +62,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 9,
   },
   {
+    id: "sample-3",
     name: "White Running Trainers",
     category: "shoes",
     color: "white",
@@ -61,6 +73,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 16,
   },
   {
+    id: "sample-4",
     name: "Black Leather Sneakers",
     category: "shoes",
     color: "black",
@@ -71,6 +84,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 5,
   },
   {
+    id: "sample-5",
     name: "White Dress Shirt",
     category: "shirt",
     color: "white",
@@ -81,6 +95,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 12,
   },
   {
+    id: "sample-6",
     name: "White Crewneck Tee",
     category: "shirt",
     color: "white",
@@ -91,6 +106,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 31,
   },
   {
+    id: "sample-7",
     name: "Black Graphic Tee",
     category: "shirt",
     color: "black",
@@ -101,6 +117,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 6,
   },
   {
+    id: "sample-8",
     name: "White Sweatshirt",
     category: "shirt",
     color: "white",
@@ -111,6 +128,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 19,
   },
   {
+    id: "sample-9",
     name: "Light Wash Jeans",
     category: "pants",
     color: "blue",
@@ -121,6 +139,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 42,
   },
   {
+    id: "sample-10",
     name: "Black Jeans",
     category: "pants",
     color: "black",
@@ -131,6 +150,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 7,
   },
   {
+    id: "sample-11",
     name: "Dark Indigo Jeans",
     category: "pants",
     color: "navy",
@@ -141,6 +161,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 11,
   },
   {
+    id: "sample-12",
     name: "Rust Trousers",
     category: "pants",
     color: "red",
@@ -151,6 +172,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 3,
   },
   {
+    id: "sample-13",
     name: "Black Suit Jacket",
     category: "jacket",
     color: "black",
@@ -161,6 +183,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 4,
   },
   {
+    id: "sample-14",
     name: "Denim Jacket",
     category: "jacket",
     color: "blue",
@@ -171,6 +194,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 8,
   },
   {
+    id: "sample-15",
     name: "Black Leather Jacket",
     category: "jacket",
     color: "black",
@@ -181,6 +205,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 10,
   },
   {
+    id: "sample-16",
     name: "Brown Leather Belt",
     category: "accessory",
     color: "brown",
@@ -191,6 +216,7 @@ const SAMPLES: SampleSpec[] = [
     wearCount: 18,
   },
   {
+    id: "sample-17",
     name: "Two-Tone Watch",
     category: "accessory",
     color: "grey",
@@ -202,20 +228,228 @@ const SAMPLES: SampleSpec[] = [
   },
 ];
 
+/**
+ * Items the owner asked to catalogue. Not demo filler: these survive "Clear
+ * examples" and behave exactly like anything captured in-app.
+ *
+ * Sneaker photography comes from StockX's product CDN, because Unsplash, Pexels
+ * and Wikimedia have no Foamposite imagery at all and naming a picture of a
+ * different shoe "Foamposite" would be a lie the catalog then repeats forever.
+ * Every image below was opened and checked against its colourway before being
+ * added. These are a retailer's copyrighted product shots — fine for a personal
+ * catalog, worth replacing with your own photos before this is ever public.
+ */
+const OWNED: SampleSpec[] = [
+  {
+    id: "foam-eggplant",
+    name: 'Air Foamposite One "Eggplant"',
+    category: "shoes",
+    color: "purple",
+    sneaker: "Nike-Air-Foamposite-One-Eggplant-2024",
+    sample: false,
+    occasions: ["everyday", "weekend"],
+    tags: ["foamposite", "2024"],
+    wornDaysAgo: 11,
+    wearCount: 14,
+  },
+  {
+    id: "foam-galaxy",
+    name: 'Air Foamposite One "Galaxy"',
+    category: "shoes",
+    color: "multi",
+    sneaker: "Nike-Air-Foamposite-One-Galaxy-2025",
+    sample: false,
+    occasions: ["weekend"],
+    tags: ["foamposite", "2025", "deadstock"],
+    wornDaysAgo: null,
+    wearCount: 0,
+  },
+  {
+    id: "foam-copper",
+    name: 'Air Foamposite One "Copper"',
+    category: "shoes",
+    color: "brown",
+    sneaker: "Nike-Air-Foamposite-One-Copper-2024",
+    sample: false,
+    occasions: ["everyday", "weekend", "date-night"],
+    tags: ["foamposite", "2024"],
+    wornDaysAgo: 73,
+    wearCount: 4,
+  },
+  {
+    id: "foam-cough-drop",
+    name: 'Air Foamposite One "Cough Drop"',
+    category: "shoes",
+    color: "red",
+    sneaker: "Nike-Air-Foamposite-One-Cough-Drop-2025",
+    sample: false,
+    occasions: ["everyday", "weekend"],
+    tags: ["foamposite", "2025"],
+    wornDaysAgo: 29,
+    wearCount: 6,
+  },
+  {
+    id: "foam-triple-white",
+    name: 'Air Foamposite One "Triple White"',
+    category: "shoes",
+    color: "white",
+    sneaker: "Nike-Air-Foamposite-One-Triple-White",
+    sample: false,
+    occasions: ["everyday", "weekend"],
+    tags: ["foamposite", "keep clean"],
+    wornDaysAgo: 140,
+    wearCount: 2,
+  },
+  {
+    id: "foam-black-volt",
+    name: 'Air Foamposite One "Black Volt"',
+    category: "shoes",
+    color: "green",
+    sneaker: "Nike-Air-Foamposite-One-Black-Volt",
+    sample: false,
+    occasions: ["everyday", "weekend", "active"],
+    tags: ["foamposite", "2025"],
+    wornDaysAgo: 8,
+    wearCount: 12,
+  },
+  {
+    id: "foam-tekken",
+    name: 'Air Foamposite One "Tekken 8"',
+    category: "shoes",
+    color: "grey",
+    sneaker: "Nike-Air-Foamposite-One-Tekken-8-Jin-Kazama",
+    sample: false,
+    occasions: ["weekend"],
+    tags: ["foamposite", "collab"],
+    wornDaysAgo: null,
+    wearCount: 0,
+  },
+  {
+    id: "aj4-bred",
+    name: 'Jordan 4 Retro "Bred Reimagined"',
+    category: "shoes",
+    color: "black",
+    sneaker: "Air-Jordan-4-Retro-Bred-Reimagined",
+    sample: false,
+    occasions: ["everyday", "weekend", "date-night"],
+    tags: ["jordan", "retro"],
+    wornDaysAgo: 6,
+    wearCount: 21,
+  },
+  {
+    id: "aj4-white-cement",
+    name: 'Jordan 4 Retro "White Cement"',
+    category: "shoes",
+    color: "white",
+    sneaker: "Air-Jordan-4-Retro-White-Cement-2025",
+    sample: false,
+    occasions: ["everyday", "weekend"],
+    tags: ["jordan", "retro"],
+    wornDaysAgo: 19,
+    wearCount: 9,
+  },
+  {
+    id: "aj3-white-cement",
+    name: 'Jordan 3 Retro "White Cement Reimagined"',
+    category: "shoes",
+    color: "white",
+    sneaker: "Air-Jordan-3-Retro-White-Cement-Reimagined",
+    sample: false,
+    occasions: ["everyday", "weekend", "date-night"],
+    tags: ["jordan", "retro"],
+    wornDaysAgo: 44,
+    wearCount: 7,
+  },
+  {
+    id: "aj11-concord-bred",
+    name: 'Jordan 11 Retro Low "Concord Bred"',
+    category: "shoes",
+    color: "white",
+    sneaker: "Air-Jordan-11-Retro-Low-Concord-Bred",
+    sample: false,
+    occasions: ["everyday", "date-night", "weekend"],
+    tags: ["jordan", "patent leather"],
+    wornDaysAgo: 33,
+    wearCount: 5,
+  },
+  {
+    id: "aj11-bred-low",
+    name: 'Jordan 11 Retro Low "Bred"',
+    category: "shoes",
+    color: "black",
+    sneaker: "Air-Jordan-11-Retro-Low-Bred-2025",
+    sample: false,
+    occasions: ["everyday", "date-night", "work"],
+    tags: ["jordan", "patent leather"],
+    wornDaysAgo: 2,
+    wearCount: 17,
+  },
+  {
+    id: "aj1-85-bred",
+    name: "Jordan 1 Retro High '85 \"Bred\"",
+    category: "shoes",
+    color: "red",
+    sneaker: "Air-Jordan-1-Retro-High-85-Bred",
+    sample: false,
+    occasions: ["everyday", "weekend", "date-night"],
+    tags: ["jordan", "og"],
+    wornDaysAgo: 57,
+    wearCount: 3,
+  },
+  {
+    id: "own-black-tee",
+    name: "Black T-Shirt",
+    category: "shirt",
+    color: "black",
+    photo: "photo-1618354691373-d851c5c3a990",
+    sample: false,
+    occasions: ["everyday", "weekend", "active"],
+    tags: ["cotton"],
+    wornDaysAgo: 5,
+    wearCount: 27,
+  },
+  {
+    id: "own-blue-jeans",
+    name: "Blue Jeans",
+    category: "pants",
+    color: "blue",
+    photo: "photo-1624378441864-6eda7eac51cb",
+    sample: false,
+    occasions: ["everyday", "weekend", "date-night"],
+    tags: ["denim"],
+    wornDaysAgo: 6,
+    wearCount: 33,
+  },
+];
+
+/** Bump when entries are added, so existing installs top up once. */
+export const SEED_VERSION = 2;
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Square, cropped, quality-capped — the shape the catalog grid expects. */
-function photoUrl(id: string): string {
+function unsplashUrl(id: string): string {
   return `https://images.unsplash.com/${id}?w=900&h=900&fit=crop&crop=entropy&q=75&auto=format`;
+}
+
+/** StockX product shots are already centred on white; just size them. */
+function stockxUrl(slug: string): string {
+  return `https://images.stockx.com/images/${slug}-Product.jpg?w=900&q=80`;
+}
+
+function resolvePhoto(spec: SampleSpec): string | null {
+  if (spec.sneaker) return stockxUrl(spec.sneaker);
+  if (spec.photo) return unsplashUrl(spec.photo);
+  return null;
 }
 
 /** Builds the sample closet. Called once, on a first run with an empty store. */
 export function buildSampleCloset(now = Date.now()): ClothingItem[] {
-  return SAMPLES.map((spec, index) => ({
-    id: `sample-${index + 1}`,
+  return [...SAMPLES, ...OWNED].map((spec, index) => ({
+    id: spec.id,
     // Staggered so "Newest" ordering is stable and doesn't look machine-made.
     createdAt: new Date(now - index * 37 * 60 * 1000).toISOString(),
-    photoUrl: photoUrl(spec.photo),
+    photoUrl: resolvePhoto(spec),
     name: spec.name,
     category: spec.category,
     color: spec.color,
@@ -224,6 +458,6 @@ export function buildSampleCloset(now = Date.now()): ClothingItem[] {
     lastWornAt:
       spec.wornDaysAgo === null ? null : new Date(now - spec.wornDaysAgo * DAY_MS).toISOString(),
     wearCount: spec.wearCount,
-    isSample: true,
+    isSample: spec.sample ?? true,
   }));
 }

@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
-import { buildSampleCloset } from "@/lib/seed";
-import { seedSamplesIfEmpty } from "@/lib/store";
+import { SEED_VERSION, buildSampleCloset } from "@/lib/seed";
+import { syncSeed } from "@/lib/store";
 
 /**
- * Seeds the example closet on a first visit. Renders nothing — it exists so the
- * write happens after hydration, on the client, where localStorage lives.
+ * Seeds the starter closet on a first visit, and tops up an existing one when
+ * new entries ship. Renders nothing — it exists so the write happens after
+ * hydration, on the client, where localStorage lives.
  */
 export default function SeedSamples() {
   useEffect(() => {
-    seedSamplesIfEmpty(buildSampleCloset);
+    syncSeed(buildSampleCloset, SEED_VERSION);
   }, []);
 
   return null;
