@@ -2,6 +2,22 @@
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * The calendar day a timestamp falls on, in the reader's own timezone.
+ *
+ * Slicing the ISO string instead reads the UTC day, which is a different day
+ * for anyone west of Greenwich for part of every evening: an outfit logged at
+ * 8pm in New York carries tomorrow's UTC date. The log grouped on that string
+ * while labelling with local time, so a night outfit split off into a second
+ * section that also called itself "Today". Everything that buckets outfits by
+ * day goes through here.
+ */
+export function localDayKey(value: string | Date): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export function daysSince(iso: string | null): number | null {
   if (!iso) return null;
   const then = new Date(iso).getTime();

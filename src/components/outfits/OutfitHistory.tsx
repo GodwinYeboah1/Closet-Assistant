@@ -10,6 +10,7 @@ import {
   type Outfit,
   type TimeSlot,
 } from "@/lib/types";
+import { localDayKey } from "@/lib/format";
 import { useCloset, useOutfits } from "@/lib/useCloset";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
@@ -47,11 +48,13 @@ function tagsOf(outfit: Outfit): Tag[] {
 /** "Today" / "Yesterday" / a written date — the log is read by day, not by clock. */
 function dayLabel(iso: string): string {
   const then = new Date(iso);
-  const startOf = (d: Date) =>
-    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  const days = Math.round((startOf(new Date()) - startOf(then)) / 86_400_000);
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
+  // Compared as local day keys: differencing timestamps gets this wrong on the
+  // two DST days a year, when a "day" is 23 or 25 hours long.
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const key = localDayKey(then);
+  if (key === localDayKey(new Date())) return "Today";
+  if (key === localDayKey(yesterday)) return "Yesterday";
   return then.toLocaleDateString(undefined, {
     weekday: "long",
     month: "long",
@@ -108,14 +111,14 @@ export default function OutfitHistory() {
     : entries;
 
   const dayCount = new Set(
-    entries.map((e) => (e.outfit.wornAt ?? e.outfit.createdAt).slice(0, 10)),
+    entries.map((e) => localDayKey(e.outfit.wornAt ?? e.outfit.createdAt)),
   ).size;
 
   // Already sorted newest-day-first, chronological within the day, by the store.
   const days = useMemo(() => {
     const grouped = new Map<string, typeof visible>();
     visible.forEach((entry) => {
-      const key = (entry.outfit.wornAt ?? entry.outfit.createdAt).slice(0, 10);
+      const key = localDayKey(entry.outfit.wornAt ?? entry.outfit.createdAt);
       grouped.set(key, [...(grouped.get(key) ?? []), entry]);
     });
     return [...grouped.entries()];
@@ -125,8 +128,11 @@ export default function OutfitHistory() {
 
   return (
     <main className="mx-auto max-w-2xl">
+      {/* Titled "Outfits", not "Worn": the tab row directly beneath already
+          says Worn, and stacking the same word twice read as a stutter. The
+          tabs are the sub-navigation, so they carry the distinction. */}
       <PageHeader
-        title="Worn"
+        title="Outfits"
         subtitle={
           entries.length
             ? `${entries.length} outfit${entries.length === 1 ? "" : "s"} across ` +
@@ -138,15 +144,15 @@ export default function OutfitHistory() {
 
       {entries.length === 0 ? (
         <EmptyState
-          title="Nothing logged yet"
-          body="Tap “Wearing this” on a suggestion and it lands here, with the date and the pieces you wore. Log one outfit a day, or one for each part of it."
-          cta={{ href: "/outfits", label: "Build an outfit" }}
+          title="Your diary starts with one outfit"
+          body="Whatever you wear today, tap “Wearing this” and it lands here — the day, the pieces, and the time of day if you changed. One a day is plenty; some days take two."
+          cta={{ href: "/outfits", label: "Pick something to wear" }}
         />
       ) : (
         <>
           {available.length > 1 ? (
-            <div className="-mx-5 mb-2 overflow-x-auto px-5 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <div className="flex w-max gap-2">
+            <div className="-mx-5 mb-2 overflow-x-auto px-5 pb-4 [mask-image:linear-gradient(to_right,#000_calc(100%-2.5rem),transparent)] [scrollbar-width:none] sm:mask-none sm:overflow-visible [&::-webkit-scrollbar]:hidden">
+              <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
                 <FilterChip active={tag === null} onClick={() => setTag(null)}>
                   All
                 </FilterChip>
@@ -167,20 +173,21 @@ export default function OutfitHistory() {
             {days.map(([day, group]) => (
               <section key={day}>
                 <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-line pb-2">
-                  <h2 className="text-sm font-medium">
+                  <h2 className="text-base font-medium tracking-tight">
                     {dayLabel(group[0].outfit.wornAt ?? group[0].outfit.createdAt)}
                   </h2>
-                  <span className="shrink-0 font-mono text-[11px] text-muted">
-                    {group.length} outfit{group.length === 1 ? "" : "s"}
-                  </span>
+                  {/* Almost every day holds one outfit, so saying "1 outfit" on
+                      each heading was noise on every row to inform none. */}
+                  {group.length > 1 ? (
+                    <span className="shrink-0 font-mono text-[11px] text-muted">
+                      {group.length} outfits
+                    </span>
+                  ) : null}
                 </div>
 
                 <ol className="space-y-3">
                   {group.map(({ outfit, pieces, tags, missing }) => (
-                    <li
-                      key={outfit.id}
-                      className="rounded-2xl border border-line bg-surface p-4"
-                    >
+                    <li key={outfit.id} className="rounded-2xl bg-surface p-4">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
                         <span className="text-sm font-medium">
                           {outfit.slot ? TIME_SLOT_LABELS[outfit.slot] : ALL_DAY_LABEL}
@@ -195,7 +202,7 @@ export default function OutfitHistory() {
                           Tagged {tags.map((t) => t.label).join(", ")}
                         </span>
                       </div>
-                      <OutfitCard items={pieces} />
+                      <OutfitCard items={pieces} stagger={false} />
                       {missing > 0 ? (
                         <p className="mt-3 text-sm text-muted">
                           {missing} piece{missing === 1 ? "" : "s"} no longer in your

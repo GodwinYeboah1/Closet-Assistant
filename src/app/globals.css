@@ -87,6 +87,17 @@ body {
   overflow: hidden;
 }
 
+/*
+ * Outfit tile grid. Phones get a fixed three across; from `sm` up the grid
+ * takes one column per piece (capped at five) so a short outfit fills the row
+ * at a comfortable size rather than hugging the left edge of a wide card.
+ */
+@media (min-width: 40rem) {
+  .grid[style*="--cols"] {
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  }
+}
+
 /* Micro-label: the one typographic signature of this direction. */
 .eyebrow {
   font-size: 10px;

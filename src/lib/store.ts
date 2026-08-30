@@ -1,5 +1,6 @@
 "use client";
 
+import { localDayKey } from "./format";
 import { TIME_SLOTS, type ClothingItem, type NewClothingItem, type Outfit } from "./types";
 
 /**
@@ -160,8 +161,8 @@ function outfitTime(outfit: Outfit): string {
 export function getOutfits(): Outfit[] {
   if (!outfitsCache) {
     outfitsCache = read<Outfit>(OUTFITS_KEY).sort((a, b) => {
-      const dayA = outfitTime(a).slice(0, 10);
-      const dayB = outfitTime(b).slice(0, 10);
+      const dayA = localDayKey(outfitTime(a));
+      const dayB = localDayKey(outfitTime(b));
       if (dayA !== dayB) return dayB.localeCompare(dayA);
       const slotA = a.slot ? TIME_SLOTS.indexOf(a.slot) : -1;
       const slotB = b.slot ? TIME_SLOTS.indexOf(b.slot) : -1;
