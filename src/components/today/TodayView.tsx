@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { daysSince } from "@/lib/format";
-import { markWorn, saveOutfit } from "@/lib/store";
+import { clearFeedbackFor, markWorn, recordFeedback, saveOutfit } from "@/lib/store";
 import { suggestOutfit, type Suggestion } from "@/lib/suggest";
-import { useCloset } from "@/lib/useCloset";
+import { useCloset, useTaste } from "@/lib/useCloset";
 import type { TimeSlot } from "@/lib/types";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
@@ -15,6 +15,7 @@ import WearControls from "@/components/outfits/WearControls";
 
 export default function TodayView() {
   const { items, ready } = useCloset();
+  const taste = useTaste();
   // Today used to render seed 0 forever: it called `suggestOutfit` with the
   // default seed and "More options" was a link to /outfits, so the card could
   // never change no matter how many times it was tapped. The suggester already
@@ -32,10 +33,13 @@ export default function TodayView() {
   const [logged, setLogged] = useState<Suggestion | null>(null);
   /** `null` means the entry stands for the whole day — the default, always. */
   const [slot, setSlot] = useState<TimeSlot | null>(null);
+  /** The logged outfit's id, so a "love this" verdict can be attached to it. */
+  const [loggedId, setLoggedId] = useState<string | null>(null);
+  const [loved, setLoved] = useState(false);
 
   const live = useMemo(
-    () => suggestOutfit(items, "everyday", seed),
-    [items, seed],
+    () => suggestOutfit(items, "everyday", seed, taste),
+    [items, seed, taste],
   );
   const suggestion = logged ?? live;
 
@@ -73,6 +77,8 @@ export default function TodayView() {
                 onClick={() => {
                   setSeed((n) => n + 1);
                   setLogged(null);
+                  setLoggedId(null);
+                  setLoved(false);
                 }}
                 className="-mr-2 inline-flex min-h-11 items-center px-2 text-sm text-muted underline-offset-4 hover:underline"
               >
@@ -85,20 +91,49 @@ export default function TodayView() {
                 <p className="mt-3 text-sm text-muted">{suggestion.rationale}</p>
                 <WearControls
                   logged={logged !== null}
+                  loved={loved}
                   slot={slot}
                   onSlot={setSlot}
                   onLog={() => {
                     setLogged(live);
                     live.items.forEach((item) => markWorn(item.id));
-                    saveOutfit({
+                    const outfit = saveOutfit({
                       itemIds: live.items.map((item) => item.id),
                       occasion: "everyday",
                       slot: slot ?? undefined,
                       wornAt: new Date().toISOString(),
                     });
+                    setLoggedId(outfit.id);
+                    setLoved(false);
+                  }}
+                  onLove={() => {
+                    if (!loggedId) return;
+                    if (loved) {
+                      clearFeedbackFor(loggedId);
+                      setLoved(false);
+                      return;
+                    }
+                    recordFeedback({
+                      itemIds: (logged ?? live).items.map((item) => item.id),
+                      occasion: "everyday",
+                      verdict: "liked",
+                      outfitId: loggedId,
+                    });
+                    setLoved(true);
+                  }}
+                  onReject={() => {
+                    recordFeedback({
+                      itemIds: live.items.map((item) => item.id),
+                      occasion: "everyday",
+                      verdict: "disliked",
+                    });
+                    setSeed((n) => n + 1);
+                    setLogged(null);
                   }}
                   onLogAnother={() => {
                     setLogged(null);
+                    setLoggedId(null);
+                    setLoved(false);
                     setSeed((n) => n + 1);
                   }}
                 />

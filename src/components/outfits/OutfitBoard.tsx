@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { markWorn, saveOutfit } from "@/lib/store";
+import { clearFeedbackFor, markWorn, recordFeedback, saveOutfit } from "@/lib/store";
 import { suggestOutfit, type Suggestion } from "@/lib/suggest";
 import {
   CATEGORY_LABELS,
@@ -11,7 +11,7 @@ import {
   type Occasion,
   type TimeSlot,
 } from "@/lib/types";
-import { useCloset } from "@/lib/useCloset";
+import { useCloset, useTaste } from "@/lib/useCloset";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import OutfitCard from "./OutfitCard";
@@ -20,6 +20,7 @@ import WearControls from "./WearControls";
 
 export default function OutfitBoard() {
   const { items, ready } = useCloset();
+  const taste = useTaste();
   const [occasion, setOccasion] = useState<Occasion>("everyday");
   const [seed, setSeed] = useState(0);
   /**
@@ -30,10 +31,13 @@ export default function OutfitBoard() {
   const [logged, setLogged] = useState<Suggestion | null>(null);
   /** `null` means the entry stands for the whole day — the default, always. */
   const [slot, setSlot] = useState<TimeSlot | null>(null);
+  /** The logged outfit's id, so a "love this" verdict can be attached to it. */
+  const [loggedId, setLoggedId] = useState<string | null>(null);
+  const [loved, setLoved] = useState(false);
 
   const live = useMemo(
-    () => suggestOutfit(items, occasion, seed),
-    [items, occasion, seed],
+    () => suggestOutfit(items, occasion, seed, taste),
+    [items, occasion, seed, taste],
   );
   const suggestion = logged ?? live;
 
@@ -69,6 +73,8 @@ export default function OutfitBoard() {
             onClick={() => {
               setOccasion(value);
               setLogged(null);
+              setLoggedId(null);
+              setLoved(false);
             }}
             aria-pressed={occasion === value}
             className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm transition-colors ${
@@ -108,6 +114,8 @@ export default function OutfitBoard() {
                 onClick={() => {
                   setSeed((n) => n + 1);
                   setLogged(null);
+                  setLoggedId(null);
+                  setLoved(false);
                 }}
                 className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm transition-transform active:scale-95"
               >
@@ -115,20 +123,49 @@ export default function OutfitBoard() {
               </button>
               <WearControls
                 logged={logged !== null}
+                loved={loved}
                 slot={slot}
                 onSlot={setSlot}
                 onLog={() => {
                   setLogged(live);
                   live.items.forEach((item) => markWorn(item.id));
-                  saveOutfit({
+                  const outfit = saveOutfit({
                     itemIds: live.items.map((item) => item.id),
                     occasion,
                     slot: slot ?? undefined,
                     wornAt: new Date().toISOString(),
                   });
+                  setLoggedId(outfit.id);
+                  setLoved(false);
+                }}
+                onLove={() => {
+                  if (!loggedId) return;
+                  if (loved) {
+                    clearFeedbackFor(loggedId);
+                    setLoved(false);
+                    return;
+                  }
+                  recordFeedback({
+                    itemIds: (logged ?? live).items.map((item) => item.id),
+                    occasion,
+                    verdict: "liked",
+                    outfitId: loggedId,
+                  });
+                  setLoved(true);
+                }}
+                onReject={() => {
+                  recordFeedback({
+                    itemIds: live.items.map((item) => item.id),
+                    occasion,
+                    verdict: "disliked",
+                  });
+                  setSeed((n) => n + 1);
+                  setLogged(null);
                 }}
                 onLogAnother={() => {
                   setLogged(null);
+                  setLoggedId(null);
+                  setLoved(false);
                   setSeed((n) => n + 1);
                 }}
               />

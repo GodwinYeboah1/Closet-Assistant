@@ -18,18 +18,31 @@ import {
  * and never asks a question. It opens on its own only after something is
  * already logged for today — the one moment a second entry genuinely needs
  * telling apart from the first — and preselects the slot the clock is in.
+ *
+ * "Not this" sits beside "Wearing this" because the two are the same kind of
+ * answer to the same question, and the app needs both. Rejection used to be
+ * spelled "Try another", which advanced a seed and told the ranker nothing —
+ * the strongest signal a styling app can get, thrown away at the moment it was
+ * given. It still advances to the next suggestion; it just writes down why
+ * first.
  */
 export default function WearControls({
   logged,
+  loved,
   slot,
   onSlot,
   onLog,
+  onLove,
+  onReject,
   onLogAnother,
 }: {
   logged: boolean;
+  loved: boolean;
   slot: TimeSlot | null;
   onSlot: (value: TimeSlot | null) => void;
   onLog: () => void;
+  onLove: () => void;
+  onReject: () => void;
   onLogAnother: () => void;
 }) {
   const [picking, setPicking] = useState(false);
@@ -40,6 +53,22 @@ export default function WearControls({
         <p className="text-sm text-muted">
           Logged for today{slot ? ` · ${TIME_SLOT_LABELS[slot]}` : ""}.
         </p>
+        <button
+          type="button"
+          onClick={onLove}
+          aria-pressed={loved}
+          className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors active:scale-95 ${
+            loved
+              ? "border-accent bg-accent font-medium text-on-accent"
+              : "border-line text-muted hover:text-ink"
+          }`}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"
+            fill={loved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8">
+            <path d="M12 20.3 4.7 13a4.6 4.6 0 1 1 6.5-6.5l.8.8.8-.8A4.6 4.6 0 1 1 19.3 13z" />
+          </svg>
+          {loved ? "Loved" : "Love this"}
+        </button>
         <button
           type="button"
           onClick={() => {
@@ -84,6 +113,13 @@ export default function WearControls({
           className="inline-flex min-h-11 items-center rounded-full bg-ink px-4 text-sm font-medium text-canvas transition-transform active:scale-95"
         >
           Wearing this
+        </button>
+        <button
+          type="button"
+          onClick={onReject}
+          className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm text-muted transition-transform hover:text-ink active:scale-95"
+        >
+          Not this
         </button>
         {picking ? null : (
           <button

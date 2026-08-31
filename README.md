@@ -24,10 +24,16 @@ The decisions that follow from it:
   the loop.
 - **Clean-up is honest.** If background separation looks implausible the app
   keeps the photo as shot and says so, rather than shipping a mangled cut-out.
-- **Suggestions rank for rotation.** Items you haven't worn in a while rank up;
-  items already in heavy rotation rank down. Each suggestion says in one plain
-  sentence why it was built that way, and names what the closet is missing
-  instead of inventing a substitute.
+- **Suggestions learn what you like.** Wearing an outfit, loving one, and
+  rejecting one all feed a taste profile built from your own history — per
+  garment, and per *pair* of garments, which is how the app works out that two
+  things go together without anyone describing either of them. Each suggestion
+  says in one plain sentence why it was built that way, in terms you can check
+  against your own log, and names what the closet is missing instead of
+  inventing a substitute.
+- **Occasion suitability outranks taste, always.** Liking something a lot is not
+  a reason to wear it to an interview. The taste, pairing and recency terms are
+  jointly bounded so they can never lift an untagged garment past a tagged one.
 
 ## Design direction
 
@@ -137,6 +143,7 @@ src/
     image.ts                 Auto-crop + background knockout, with bail-outs
     color.ts                 RGB → colour bucket
     seed.ts                  Starter closet: staples + the sneaker collection
+    taste.ts                 Preference model learned from wears and verdicts
     suggest.ts               Deterministic outfit ranker
     format.ts                "Worn 12 days ago"
 docs/creative-brief.md       Research and design decisions
@@ -149,7 +156,13 @@ photographed), `category` (shoes / shirt / pants / jacket /
 accessory), `color`, `tags[]`, `occasions[]`, `name?`, `lastWornAt`,
 `wearCount`, `createdAt`.
 
-`Outfit` — `itemIds[]`, `occasion`, `note?`, `wornAt`, `createdAt`.
+`Outfit` — `itemIds[]`, `occasion`, `slot?`, `note?`, `wornAt`, `createdAt`.
+
+`OutfitFeedback` — `itemIds[]`, `occasion`, `verdict` (`liked` / `disliked`),
+`outfitId?`, `createdAt`. One record per explicit judgment. Wearing an outfit is
+already implicit endorsement and is read straight from the log, so this type
+only carries what the log can't say: that you loved something, or that you said
+no to a suggestion you never wore.
 
 Seeded examples carry `isSample: true`; nothing else distinguishes them, so they
 behave exactly like real items until you clear them.
@@ -176,6 +189,9 @@ nothing else changes.
   means rewriting `src/lib/store.ts` and nothing else — every read and write in
   the app already goes through it.
 - **No test runner is wired up yet.** The pure logic in `image.ts` (mask,
-  bounds, crop geometry) and `suggest.ts` was verified headlessly during
-  development; Vitest is the obvious next addition.
+  bounds, crop geometry), `suggest.ts` and `taste.ts` was verified headlessly
+  during development — the taste model against twelve assertions covering
+  co-occurrence, rejection, cold start, the occasion invariant and score bounds.
+  `taste.ts` imports nothing from the store precisely so it stays runnable
+  outside a browser. Vitest is the obvious next addition.
 - **No auth, no sync, no backend.** Everything is per-browser.

@@ -1,7 +1,14 @@
 "use client";
 
 import { localDayKey } from "./format";
-import { TIME_SLOTS, type ClothingItem, type NewClothingItem, type Outfit } from "./types";
+import {
+  TIME_SLOTS,
+  type ClothingItem,
+  type NewClothingItem,
+  type Outfit,
+  type OutfitFeedback,
+  type Verdict,
+} from "./types";
 
 /**
  * Placeholder persistence layer.
@@ -16,6 +23,7 @@ import { TIME_SLOTS, type ClothingItem, type NewClothingItem, type Outfit } from
 
 const ITEMS_KEY = "closet-assistant:items:v1";
 const OUTFITS_KEY = "closet-assistant:outfits:v1";
+const FEEDBACK_KEY = "closet-assistant:feedback:v1";
 const SEEDED_KEY = "closet-assistant:seeded:v1";
 const SEED_VERSION_KEY = "closet-assistant:seed-version";
 const CHANGE_EVENT = "closet-assistant:change";
@@ -47,6 +55,7 @@ function isQuotaError(error: unknown): boolean {
 /** Cached so `useSyncExternalStore` gets a referentially stable snapshot. */
 let itemsCache: ClothingItem[] | null = null;
 let outfitsCache: Outfit[] | null = null;
+let feedbackCache: OutfitFeedback[] | null = null;
 
 function read<T>(key: string): T[] {
   if (typeof window === "undefined") return [];
@@ -69,6 +78,7 @@ function write<T>(key: string, value: T[]) {
   }
   itemsCache = null;
   outfitsCache = null;
+  feedbackCache = null;
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
@@ -181,6 +191,51 @@ export function saveOutfit(
   return outfit;
 }
 
+/** Every explicit verdict the wearer has passed, newest first. */
+export function getFeedback(): OutfitFeedback[] {
+  if (!feedbackCache) {
+    feedbackCache = read<OutfitFeedback>(FEEDBACK_KEY).sort((a, b) =>
+      b.createdAt.localeCompare(a.createdAt),
+    );
+  }
+  return feedbackCache;
+}
+
+/**
+ * Records a verdict on a combination.
+ *
+ * Verdicts on a logged outfit are upserted by `outfitId`, so tapping the same
+ * heart twice doesn't stack two likes, and switching from liked to disliked
+ * replaces rather than contradicts. Rejections of a suggestion carry no
+ * `outfitId` and are always appended: saying no to the same pairing three times
+ * is three pieces of evidence, not one.
+ */
+export function recordFeedback(input: {
+  itemIds: string[];
+  occasion: OutfitFeedback["occasion"];
+  verdict: Verdict;
+  outfitId?: string;
+}): void {
+  const existing = read<OutfitFeedback>(FEEDBACK_KEY);
+  const rest = input.outfitId
+    ? existing.filter((entry) => entry.outfitId !== input.outfitId)
+    : existing;
+  const entry: OutfitFeedback = {
+    ...input,
+    id: id(),
+    createdAt: new Date().toISOString(),
+  };
+  write(FEEDBACK_KEY, [entry, ...rest]);
+}
+
+/** Removes the verdict on a logged outfit, so a mis-tap is undoable. */
+export function clearFeedbackFor(outfitId: string): void {
+  write(
+    FEEDBACK_KEY,
+    read<OutfitFeedback>(FEEDBACK_KEY).filter((entry) => entry.outfitId !== outfitId),
+  );
+}
+
 /**
  * Seeds a first-run closet, and tops up existing ones when new entries ship.
  *
@@ -229,6 +284,15 @@ export function clearSamples(): void {
     OUTFITS_KEY,
     read<Outfit>(OUTFITS_KEY).filter((fit) => !fit.itemIds.some((id) => removedIds.has(id))),
   );
+  // Taste learned from demo filler is not taste. Clearing the examples has to
+  // clear what they taught the ranker, or the samples keep voting after they're
+  // gone.
+  write(
+    FEEDBACK_KEY,
+    read<OutfitFeedback>(FEEDBACK_KEY).filter(
+      (entry) => !entry.itemIds.some((id) => removedIds.has(id)),
+    ),
+  );
 }
 
 /** Subscribe to any store write, including writes from another tab. */
@@ -238,6 +302,7 @@ export function subscribe(listener: () => void): () => void {
   const onChange = () => {
     itemsCache = null;
     outfitsCache = null;
+    feedbackCache = null;
     listener();
   };
   window.addEventListener(CHANGE_EVENT, onChange);

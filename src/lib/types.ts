@@ -118,6 +118,33 @@ export function slotForDate(date = new Date()): TimeSlot {
   return "night";
 }
 
+/**
+ * An explicit judgment on a combination of garments.
+ *
+ * Wearing an outfit is already an implicit endorsement — it lands in the outfit
+ * log and the ranker reads it from there. This type is for the two things the
+ * log can't express: saying you *loved* something you wore, and saying no to a
+ * suggestion you never wore at all. The second is the more valuable signal and
+ * the one the app used to throw away: tapping "Try another" bumped a seed and
+ * discarded the rejection.
+ *
+ * Keyed by `itemIds` rather than by outfit, because the judgment is about the
+ * combination. `outfitId` is set only when the verdict was passed on a logged
+ * outfit, so history can show it back.
+ */
+export type Verdict = "liked" | "disliked";
+
+export type OutfitFeedback = {
+  id: string;
+  /** The combination judged, in the order it was shown. */
+  itemIds: string[];
+  occasion: Occasion;
+  verdict: Verdict;
+  /** Set when the verdict was given on an outfit in the log. */
+  outfitId?: string;
+  createdAt: string;
+};
+
 export type ClothingItem = {
   id: string;
   /**
