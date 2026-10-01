@@ -11,12 +11,21 @@ export const metadata: Metadata = {
   title: "Closet Assistant",
   description:
     "Catalog the clothes you own and get outfit suggestions built only from your own wardrobe.",
+  // Add-to-Home-Screen chrome on iOS/Android; harmless in a normal browser tab.
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Closet",
+  },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0e10",
-  // The capture screen is full-bleed; keep it out from under the notch.
+  width: "device-width",
+  initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#0d0e10",
+  // Capture is full-bleed; cover keeps it out from under the notch / home bar.
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

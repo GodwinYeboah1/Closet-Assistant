@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "phone": "bash -c 'if command -v cloudflared >/dev/null 2>&1; then cloudflared tunnel --url http://localhost:3000; else npx --yes localtunnel --port 3000; fi'"
   },
   "dependencies": {
     "next": "16.3.3",

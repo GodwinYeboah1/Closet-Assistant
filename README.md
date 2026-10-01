@@ -114,9 +114,22 @@ npm run lint       # eslint
 npx tsc --noEmit   # typecheck
 ```
 
-The camera needs a **secure context**: `localhost` works, but on a phone over
-LAN you'll need HTTPS (`next dev --experimental-https`, or a tunnel). Without a
-camera the "Library" button runs the same flow from an existing photo.
+The camera needs a **secure context**: `localhost` works, but on a phone you'll
+need HTTPS. From a second terminal (with `npm run dev` already running):
+
+```bash
+npm run phone        # prints an https://….loca.lt URL — open that on your phone
+```
+
+Or, if you have [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/) installed:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+```
+
+`next.config.ts` already allows those tunnel hostnames via `allowedDevOrigins`,
+so the page and HMR assets load instead of being blocked. Without a camera the
+"Library" button runs the same flow from an existing photo.
 
 ## Project structure
 
